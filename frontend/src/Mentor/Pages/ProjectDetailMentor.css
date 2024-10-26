@@ -1,0 +1,165 @@
+.project-detail-mentor {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    font-family: Arial, sans-serif;
+    margin-top: 50px;
+}
+
+h1, h2 {
+    color: #333;
+    margin-bottom: 10px;
+}
+
+p {
+    color: #555;
+    line-height: 1.6;
+}
+
+.mentor-info {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.mentor-profile {
+    display: flex;
+    align-items: center;
+}
+
+.mentor-profile img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.github-repo {
+    margin: 20px 0;
+}
+
+.github-repo input[type="url"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    font-size: 16px;
+}
+
+.github-repo button {
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.github-repo button:hover {
+    background-color: #45a049;
+}
+
+.team-members ul {
+    list-style-type: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.team-members ul li {
+    display: flex;
+    align-items: center;
+    margin-right: 20px;
+    margin-bottom: 10px;
+}
+
+.team-members ul li img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.tasks ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 20px 0;
+}
+
+.tasks ul li {
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    background-color: #f9f9f9;
+}
+
+.tasks ul li select {
+    margin-left: 10px;
+}
+
+.support-requests ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.support-requests ul li {
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    background-color: #f1f1f1;
+}
+
+.support-requests ul li h3 {
+    margin: 0 0 5px 0;
+}
+
+.support-requests ul li p {
+    margin: 0 0 10px 0;
+}
+
+.support-requests ul li button {
+    padding: 8px 15px;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.support-requests ul li button:hover {
+    background-color: #0056b3;
+}
+
+.mentor-response {
+    margin-top: 20px;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+.mentor-response textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+    margin-bottom: 10px;
+    resize: vertical;
+}
+
+.mentor-response button {
+    padding: 10px 20px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.mentor-response button:hover {
+    background-color: #218838;
+}

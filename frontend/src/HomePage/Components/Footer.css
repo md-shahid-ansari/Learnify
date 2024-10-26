@@ -1,0 +1,16 @@
+.footer {
+    background-color: #1a3b5d;
+    color: white;
+    text-align: center;
+    padding: 20px;
+  }
+  
+  .footer p{
+    color: white;
+  }
+  .social-icons a {
+    color: white;
+    margin: 0 10px;
+    text-decoration: none;
+  }
+  

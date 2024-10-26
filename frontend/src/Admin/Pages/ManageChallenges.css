@@ -1,0 +1,45 @@
+/* ManageChallenges.css */
+
+.manage-challenges {
+    padding: 20px;
+}
+
+.challenge-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.challenge-table th,
+.challenge-table td {
+    border: 1px solid #ccc;
+    padding: 10px;
+    text-align: left;
+}
+
+.edit-btn,
+.delete-btn {
+    padding: 5px 10px;
+    margin: 5px;
+    cursor: pointer;
+}
+
+.edit-btn {
+    background-color: #4CAF50; /* Green */
+    color: white;
+    border: none;
+}
+
+.delete-btn {
+    background-color: #f44336; /* Red */
+    color: white;
+    border: none;
+}
+
+.edit-btn:hover {
+    background-color: #45a049;
+}
+
+.delete-btn:hover {
+    background-color: #d32f2f;
+}

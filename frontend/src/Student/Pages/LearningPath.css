@@ -1,0 +1,72 @@
+.learning-path {
+    padding: 20px;
+    font-family: Arial, sans-serif;
+    margin-top: 50px;
+}
+
+.learning-path-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+h1 {
+    font-size: 28px;
+    margin-bottom: 10px;
+}
+
+p {
+    font-size: 16px;
+    color: #555;
+}
+
+.modules-section, .certifications-section {
+    margin-top: 30px;
+}
+
+h2 {
+    font-size: 22px;
+    margin-bottom: 15px;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+.module-card, .certification-card {
+    background-color: #f9f9f9;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.module-card h3, .certification-card h3 {
+    margin: 0 0 10px;
+}
+
+p {
+    margin: 0 0 10px;
+}
+
+.next-btn {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 15px;
+    text-decoration: none;
+    border-radius: 5px;
+    display: inline-block;
+}
+
+.next-btn:hover {
+    background-color: #45a049;
+}
+
+.cert-link {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.cert-link:hover {
+    text-decoration: underline;
+}
