@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 
-export const verifyMentor = (req, res, next) => {
-    const token = req.cookies.mentorToken;  // Updated to mentorToken
+export const verifyAdmin = (req, res, next) => {
+    const token = req.cookies.adminToken;  // Updated to adminToken
     try {
         if (!token) {
             return res.status(401).json({ success: false, message: "Unauthorized - no token provided" });
@@ -12,7 +12,7 @@ export const verifyMentor = (req, res, next) => {
             return res.status(401).json({ success: false, message: "Unauthorized - invalid token" });
         }
 
-        req.userId = decoded.userId;  // Attach the mentor ID to the request object
+        req.userId = decoded.userId;  // Attach the admin ID to the request object
         next();  // Continue to the next middleware or route handler
 
     } catch (error) {

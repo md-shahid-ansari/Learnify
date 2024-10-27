@@ -3,12 +3,12 @@ import AutoIncrementFactory from "mongoose-sequence";
 
 const AutoIncrement = AutoIncrementFactory(mongoose);
 
-const companySchema = new mongoose.Schema({
-    companyId: {
+const adminSchema = new mongoose.Schema({
+    adminId: {
         type: Number,
         unique: true
     },
-    companyName: {
+    adminName: {
         type: String,
         required: true
     },
@@ -21,23 +21,9 @@ const companySchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    industry: {
-        type: String,
-    },
-    description: {
-        type: String,
-    },
-    contactInfo: {
-        email: {
-            type: String,
-        },
-        contactNumber: {
-            type: String,
-        }
-    },
-    challengesPosted: {
-        type: [Number],  // List of challenge IDs posted by the company
-        default: []
+    constactNumber: {
+        type: Number,
+        required: true,
     },
     dateCreated: {
         type: Date,
@@ -47,6 +33,22 @@ const companySchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    role: {
+        type: String,
+        enum: ['superadmin', 'admin', 'moderator'],
+        default: 'admin'
+    },
+    lastLogin: {
+        type: Date,
+        default: null
+    },
+    activityLog: [{
+        action: String,
+        timestamp: {
+            type: Date,
+            default: Date.now
+        }
+    }],
     resetPasswordToken: {
         type: String,
         default: null  // Token for password reset
@@ -65,7 +67,7 @@ const companySchema = new mongoose.Schema({
     }
 }, { timestamps: true });
 
-// Apply the auto-increment plugin to the companySchema
-companySchema.plugin(AutoIncrement, { inc_field: 'companyId', start_seq: 1 });
+// Apply the auto-increment plugin to the adminSchema
+adminSchema.plugin(AutoIncrement, { inc_field: 'adminId', start_seq: 1 });
 
-export const Company = mongoose.model('Company', companySchema);
+export const Admin = mongoose.model('Admin', adminSchema);

@@ -1,6 +1,6 @@
 import { Student } from '../models/student.model.js';
-import { Mentor } from '../models/mentor.model.js';
-import { Company } from '../models/company.model.js';
+import { Tutor } from '../models/tutor.model.js';
+import { Admin } from '../models/admin.model.js';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import { generateVerificationToken } from '../utils/generateVerificationToken.js';
@@ -10,7 +10,6 @@ import { sendVerificationEmail, sendWelcomeEmail , sendPasswordResetEmail, sendR
 
 //student
 
-// Student Registration
 export const studentRegister = async (req, res) => {
     const { 
         email, 
@@ -93,7 +92,7 @@ export const studentRegister = async (req, res) => {
     }
 };
 
-// Verify Student Email
+
 export const verifyStudentEmail = async (req, res) => {
     const { code } = req.body;
     try {
@@ -128,7 +127,7 @@ export const verifyStudentEmail = async (req, res) => {
     }
 };
 
-// Student Login
+
 export const studentLogin = async (req, res) => {
     const { email, password } = req.body;
     try {
@@ -161,7 +160,7 @@ export const studentLogin = async (req, res) => {
     }
 };
 
-// Student Forgot Password
+
 export const studentForgot = async (req, res) => {
     const { email } = req.body;
     try {
@@ -193,7 +192,7 @@ export const studentForgot = async (req, res) => {
     }
 };
 
-// Student Reset Password
+
 export const studentReset = async (req, res) => {
     try {
         const { token } = req.params;
@@ -227,13 +226,13 @@ export const studentReset = async (req, res) => {
     }
 };
 
-// Student Logout
+
 export const studentLogout = async (req, res) => {
     res.clearCookie("studentToken");
     res.status(200).json({ success: true, message: "Logged out successfully" });
 };
 
-// Authenticate Student
+
 export const authStudent = async (req, res) => {
     try {
         const student = await Student.findById(req.userId).select("-password");
@@ -250,9 +249,10 @@ export const authStudent = async (req, res) => {
 
 
 
-// mentor 
 
-export const mentorRegister = async (req, res) => {
+//tutor
+
+export const tutorRegister = async (req, res) => {
     const {
         email,
         password,
@@ -268,22 +268,21 @@ export const mentorRegister = async (req, res) => {
     } = req.body;
 
     try {
-        // Mandatory fields validation
         if (!email || !password || !name) {
             throw new Error("Email, password, and name are required");
         }
 
-        let mentor = await Mentor.findOne({ email });
+        let tutor = await Tutor.findOne({ email });
 
-        if (mentor && mentor.isVerified === true) {
-            return res.status(400).json({ success: false, message: "Mentor Already Exists" });
+        if (tutor && tutor.isVerified === true) {
+            return res.status(400).json({ success: false, message: "Tutor Already Exists" });
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
         const verificationToken = generateVerificationToken();
 
-        if (!mentor) {
-            mentor = new Mentor({
+        if (!tutor) {
+            tutor = new Tutor({
                 email,
                 password: hashedPassword,
                 name,
@@ -299,32 +298,31 @@ export const mentorRegister = async (req, res) => {
                 verificationExpireAt: Date.now() + 24 * 60 * 60 * 1000 // 24 hours
             });
         } else {
-            mentor.password = hashedPassword;
-            mentor.name = name;
-            mentor.dateOfBirth = dateOfBirth;
-            mentor.gender = gender;
-            mentor.contactNumber = contactNumber;
-            mentor.address = address;
-            mentor.expertiseAreas = expertiseAreas;
-            mentor.yearsOfExperience = yearsOfExperience;
-            mentor.certifications = certifications;
-            mentor.linkedInProfile = linkedInProfile;
-            mentor.verificationToken = verificationToken;
-            mentor.verificationExpireAt = Date.now() + 24 * 60 * 60 * 1000 // 24 hours
+            tutor.password = hashedPassword;
+            tutor.name = name;
+            tutor.dateOfBirth = dateOfBirth;
+            tutor.gender = gender;
+            tutor.contactNumber = contactNumber;
+            tutor.address = address;
+            tutor.expertiseAreas = expertiseAreas;
+            tutor.yearsOfExperience = yearsOfExperience;
+            tutor.certifications = certifications;
+            tutor.linkedInProfile = linkedInProfile;
+            tutor.verificationToken = verificationToken;
+            tutor.verificationExpireAt = Date.now() + 24 * 60 * 60 * 1000 // 24 hours
         }
 
-        await mentor.save();
+        await tutor.save();
 
-        // JWT
-        generateTokenAndSetCookie(res, mentor._id, "mentorToken");
+        generateTokenAndSetCookie(res, tutor._id, "tutorToken");
 
-        await sendVerificationEmail(mentor.email, verificationToken);
+        await sendVerificationEmail(tutor.email, verificationToken);
 
         res.status(201).json({
             success: true,
             message: "User created successfully",
             user: {
-                ...mentor._doc,
+                ...tutor._doc,
                 password: undefined,
             }
         });
@@ -334,30 +332,29 @@ export const mentorRegister = async (req, res) => {
     }
 };
 
-
-export const mentorLogin = async (req, res) => {
+export const tutorLogin = async (req, res) => {
     const { email, password } = req.body;
     try {
-        const mentor = await Mentor.findOne({ email });
-        if (!mentor) {
+        const tutor = await Tutor.findOne({ email });
+        if (!tutor) {
             return res.status(400).json({ success: false, message: "Invalid email or password" });
         }
 
-        const isValidPassword = await bcrypt.compare(password, mentor.password);
+        const isValidPassword = await bcrypt.compare(password, tutor.password);
         if (!isValidPassword) {
             return res.status(400).json({ success: false, message: "Invalid email or password" });
         }
 
-        generateTokenAndSetCookie(res, mentor._id, "mentorToken");
+        generateTokenAndSetCookie(res, tutor._id, "tutorToken");
 
-        mentor.lastLogin = new Date();
-        await mentor.save();
+        tutor.lastLogin = new Date();
+        await tutor.save();
 
         res.status(200).json({
             success: true,
             message: "User logged in successfully",
             user: {
-                ...mentor._doc,
+                ...tutor._doc,
                 password: undefined,
             }
         });
@@ -368,32 +365,31 @@ export const mentorLogin = async (req, res) => {
     }
 };
 
-
-export const verifyMentorEmail = async (req, res) => {
+export const verifyTutorEmail = async (req, res) => {
     const { code } = req.body;
     try {
-        const mentor = await Mentor.findOne({
+        const tutor = await Tutor.findOne({
             verificationToken: code,
             verificationExpireAt: { $gt: Date.now() }
         });
 
-        if (!mentor) {
+        if (!tutor) {
             return res.status(400).json({ success: false, message: "Invalid or expired verification code" });
         }
 
-        mentor.isVerified = true;
-        mentor.verificationToken = undefined;
-        mentor.verificationExpireAt = undefined;
+        tutor.isVerified = true;
+        tutor.verificationToken = undefined;
+        tutor.verificationExpireAt = undefined;
 
-        await mentor.save();
+        await tutor.save();
 
-        await sendWelcomeEmail(mentor.email, mentor.name);
+        await sendWelcomeEmail(tutor.email, tutor.name);
 
         res.status(200).json({
             success: true,
             message: "User verified successfully",
             user: {
-                ...mentor._doc,
+                ...tutor._doc,
                 password: undefined,
             }
         });
@@ -403,26 +399,23 @@ export const verifyMentorEmail = async (req, res) => {
     }
 };
 
-
-export const mentorForgot = async (req, res) => {
+export const tutorForgot = async (req, res) => {
     const { email } = req.body;
     try {
-        const mentor = await Mentor.findOne({ email });
-        if (!mentor) {
+        const tutor = await Tutor.findOne({ email });
+        if (!tutor) {
             return res.status(400).json({ success: false, message: "Email not found" });
         }
 
-        // Generate reset token
         const resetToken = crypto.randomBytes(20).toString("hex");
         const resetTokenExpiresAt = Date.now() + 1 * 60 * 60 * 1000 // 1 hour
 
-        mentor.resetPasswordToken = resetToken;
-        mentor.resetPasswordExpireAt = resetTokenExpiresAt;
+        tutor.resetPasswordToken = resetToken;
+        tutor.resetPasswordExpireAt = resetTokenExpiresAt;
 
-        await mentor.save();
+        await tutor.save();
 
-        // Send email
-        await sendPasswordResetEmail(mentor.email, `${process.env.CLIENT_URL}/mentor-reset/${resetToken}`);
+        await sendPasswordResetEmail(tutor.email, `${process.env.CLIENT_URL}/tutor-reset/${resetToken}`);
 
         res.status(200).json({
             success: true,
@@ -435,30 +428,27 @@ export const mentorForgot = async (req, res) => {
     }
 };
 
-
-export const mentorReset = async (req, res) => {
+export const tutorReset = async (req, res) => {
     try {
         const { token } = req.params;
         const { password } = req.body;
 
-        const mentor = await Mentor.findOne({
+        const tutor = await Tutor.findOne({
             resetPasswordToken: token,
             resetPasswordExpireAt: { $gt: Date.now() }
         });
 
-        if (!mentor) {
+        if (!tutor) {
             return res.status(400).json({ success: false, message: "Invalid token or expired" });
         }
 
-        // Update password
         const hashedPassword = await bcrypt.hash(password, 10);
-        mentor.password = hashedPassword;
-        mentor.resetPasswordToken = undefined;
-        mentor.resetPasswordExpireAt = undefined;
-        await mentor.save();
+        tutor.password = hashedPassword;
+        tutor.resetPasswordToken = undefined;
+        tutor.resetPasswordExpireAt = undefined;
+        await tutor.save();
 
-        // Send email
-        await sendResetSuccessEmail(mentor.email);
+        await sendResetSuccessEmail(tutor.email);
 
         res.status(200).json({
             success: true,
@@ -471,20 +461,18 @@ export const mentorReset = async (req, res) => {
     }
 };
 
-
-export const mentorLogout = async (req, res) => {
-    res.clearCookie("mentorToken");
+export const tutorLogout = async (req, res) => {
+    res.clearCookie("tutorToken");
     res.status(200).json({ success: true, message: "Logged out successfully" });
 };
 
-
-export const authMentor = async (req, res) => {
+export const authTutor = async (req, res) => {
     try {
-        const mentor = await Mentor.findById(req.userId).select("-password");
-        if (!mentor) {
-            return res.status(400).json({ success: false, message: "Mentor not found" });
+        const tutor = await Tutor.findById(req.userId).select("-password");
+        if (!tutor) {
+            return res.status(400).json({ success: false, message: "Tutor not found" });
         }
-        res.status(200).json({ success: true, mentor });
+        res.status(200).json({ success: true, tutor });
     } catch (error) {
         console.log("Error in check auth:", error);
         res.status(400).json({ success: false, message: error.message });
@@ -494,81 +482,55 @@ export const authMentor = async (req, res) => {
 
 
 
-// company 
+// admin
 
-export const companyRegister = async (req, res) => {
-    const {
-        email,
-        password,
-        name,
-        registrationNumber,
-        contactPerson,
-        contactNumber,
-        address,
-        industry,
-        companyWebsite,
-        linkedinProfile,
-        companySize
-    } = req.body;
+export const adminRegister = async (req, res) => {
+    const { email, password, adminName, contactNumber, role } = req.body;
 
     try {
-        // Mandatory fields validation
-        if (!email || !password || !name) {
-            throw new Error("Email, password, and name are required");
+        // Validate required fields
+        if (!email || !password || !adminName) {
+            throw new Error("Email, password, and adminName are required");
         }
 
-        let company = await Company.findOne({ email });
-
-        if (company && company.isVerified === true) {
-            return res.status(400).json({ success: false, message: "Company already exists" });
+        let admin = await Admin.findOne({ email });
+        if (admin && admin.isVerified === true) {
+            return res.status(400).json({ success: false, message: "Admin already exists" });
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
         const verificationToken = generateVerificationToken();
 
-        if (!company) {
-            company = new Company({
+        if (!admin) {
+            admin = new Admin({
                 email,
                 password: hashedPassword,
-                companyName:name,
-                registrationNumber,
-                contactPerson,
+                adminName,
                 contactNumber,
-                address,
-                industry,
-                companyWebsite,
-                linkedinProfile,
-                companySize,
+                role,
                 verificationToken,
-                verificationExpireAt: Date.now() + 24 * 60 * 60 * 1000 // 24 hours
+                verificationExpireAt: Date.now() + 24 * 60 * 60 * 1000, // 24 hours
             });
         } else {
-            company.password = hashedPassword;
-            company.companyName = name;
-            company.registrationNumber = registrationNumber;
-            company.contactPerson = contactPerson;
-            company.contactNumber = contactNumber;
-            company.address = address;
-            company.industry = industry;
-            company.companyWebsite = companyWebsite;
-            company.linkedinProfile = linkedinProfile;
-            company.companySize = companySize;
-            company.verificationToken = verificationToken;
-            company.verificationExpireAt = Date.now() + 24 * 60 * 60 * 1000 // 24 hours
+            admin.password = hashedPassword;
+            admin.adminName = adminName;
+            admin.contactNumber = contactNumber;
+            admin.role = role;
+            admin.verificationToken = verificationToken;
+            admin.verificationExpireAt = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
         }
 
-        await company.save();
+        await admin.save();
 
-        // JWT
-        generateTokenAndSetCookie(res, company._id, "companyToken");
-
-        await sendVerificationEmail(company.email, verificationToken);
+        // JWT and Verification Email
+        generateTokenAndSetCookie(res, admin._id, "adminToken");
+        await sendVerificationEmail(admin.email, verificationToken);
 
         res.status(201).json({
             success: true,
-            message: "Company registered successfully",
-            company: {
-                ...company._doc,
+            message: "Admin registered successfully",
+            admin: {
+                ...admin._doc,
                 password: undefined,
             }
         });
@@ -579,29 +541,29 @@ export const companyRegister = async (req, res) => {
 };
 
 
-export const companyLogin = async (req, res) => {
+export const adminLogin = async (req, res) => {
     const { email, password } = req.body;
     try {
-        const company = await Company.findOne({ email });
-        if (!company) {
+        const admin = await Admin.findOne({ email });
+        if (!admin) {
             return res.status(400).json({ success: false, message: "Invalid email or password" });
         }
 
-        const isValidPassword = await bcrypt.compare(password, company.password);
+        const isValidPassword = await bcrypt.compare(password, admin.password);
         if (!isValidPassword) {
             return res.status(400).json({ success: false, message: "Invalid email or password" });
         }
 
-        generateTokenAndSetCookie(res, company._id, "companyToken");
+        generateTokenAndSetCookie(res, admin._id, "adminToken");
 
-        company.lastLogin = new Date();
-        await company.save();
+        admin.lastLogin = new Date();
+        await admin.save();
 
         res.status(200).json({
             success: true,
-            message: "Company logged in successfully",
-            company: {
-                ...company._doc,
+            message: "Admin logged in successfully",
+            admin: {
+                ...admin._doc,
                 password: undefined,
             }
         });
@@ -613,31 +575,30 @@ export const companyLogin = async (req, res) => {
 };
 
 
-export const verifyCompanyEmail = async (req, res) => {
+export const verifyAdminEmail = async (req, res) => {
     const { code } = req.body;
     try {
-        const company = await Company.findOne({
+        const admin = await Admin.findOne({
             verificationToken: code,
             verificationExpireAt: { $gt: Date.now() }
         });
 
-        if (!company) {
+        if (!admin) {
             return res.status(400).json({ success: false, message: "Invalid or expired verification code" });
         }
 
-        company.isVerified = true;
-        company.verificationToken = undefined;
-        company.verificationExpireAt = undefined;
+        admin.isVerified = true;
+        admin.verificationToken = undefined;
+        admin.verificationExpireAt = undefined;
 
-        await company.save();
-
-        await sendWelcomeEmail(company.email, company.name);
+        await admin.save();
+        await sendWelcomeEmail(admin.email, admin.adminName);
 
         res.status(200).json({
             success: true,
-            message: "Company verified successfully",
-            company: {
-                ...company._doc,
+            message: "Admin verified successfully",
+            admin: {
+                ...admin._doc,
                 password: undefined,
             }
         });
@@ -648,25 +609,23 @@ export const verifyCompanyEmail = async (req, res) => {
 };
 
 
-export const companyForgot = async (req, res) => {
+export const adminForgot = async (req, res) => {
     const { email } = req.body;
     try {
-        const company = await Company.findOne({ email });
-        if (!company) {
+        const admin = await Admin.findOne({ email });
+        if (!admin) {
             return res.status(400).json({ success: false, message: "Email not found" });
         }
 
-        // Generate reset token
         const resetToken = crypto.randomBytes(20).toString("hex");
-        const resetTokenExpiresAt = Date.now() + 1 * 60 * 60 * 1000 // 1 hour
+        const resetTokenExpiresAt = Date.now() + 1 * 60 * 60 * 1000; // 1 hour
 
-        company.resetPasswordToken = resetToken;
-        company.resetPasswordExpireAt = resetTokenExpiresAt;
+        admin.resetPasswordToken = resetToken;
+        admin.resetPasswordExpireAt = resetTokenExpiresAt;
 
-        await company.save();
+        await admin.save();
 
-        // Send email
-        await sendPasswordResetEmail(company.email, `${process.env.CLIENT_URL}/company-reset/${resetToken}`);
+        await sendPasswordResetEmail(admin.email, `${process.env.CLIENT_URL}/admin-reset/${resetToken}`);
 
         res.status(200).json({
             success: true,
@@ -680,55 +639,19 @@ export const companyForgot = async (req, res) => {
 };
 
 
-export const companyReset = async (req, res) => {
-    try {
-        const { token } = req.params;
-        const { password } = req.body;
-
-        const company = await Company.findOne({
-            resetPasswordToken: token,
-            resetPasswordExpireAt: { $gt: Date.now() }
-        });
-
-        if (!company) {
-            return res.status(400).json({ success: false, message: "Invalid token or expired" });
-        }
-
-        // Update password
-        const hashedPassword = await bcrypt.hash(password, 10);
-        company.password = hashedPassword;
-        company.resetPasswordToken = undefined;
-        company.resetPasswordExpireAt = undefined;
-        await company.save();
-
-        // Send email
-        await sendResetSuccessEmail(company.email);
-
-        res.status(200).json({
-            success: true,
-            message: "Password changed successfully",
-        });
-
-    } catch (error) {
-        console.log("Error in reset password:", error);
-        res.status(400).json({ success: false, message: error.message });
-    }
-};
-
-
-export const companyLogout = async (req, res) => {
-    res.clearCookie("companyToken");
+export const adminLogout = async (req, res) => {
+    res.clearCookie("adminToken");
     res.status(200).json({ success: true, message: "Logged out successfully" });
 };
 
 
-export const authCompany = async (req, res) => {
+export const authAdmin = async (req, res) => {
     try {
-        const company = await Company.findById(req.userId).select("-password");
-        if (!company) {
-            return res.status(400).json({ success: false, message: "Company not found" });
+        const admin = await Admin.findById(req.userId).select("-password");
+        if (!admin) {
+            return res.status(400).json({ success: false, message: "Admin not found" });
         }
-        res.status(200).json({ success: true, company });
+        res.status(200).json({ success: true, admin });
     } catch (error) {
         console.log("Error in check auth:", error);
         res.status(400).json({ success: false, message: error.message });

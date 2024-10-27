@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 
-export const verifyCompany = (req, res, next) => {
-    const token = req.cookies.companyToken;  // Updated to companyToken
+export const verifyTutor = (req, res, next) => {
+    const token = req.cookies.tutorToken;  // Updated to tutorToken
     try {
         if (!token) {
             return res.status(401).json({ success: false, message: "Unauthorized - no token provided" });
@@ -12,7 +12,7 @@ export const verifyCompany = (req, res, next) => {
             return res.status(401).json({ success: false, message: "Unauthorized - invalid token" });
         }
 
-        req.userId = decoded.userId;  // Attach the company ID to the request object
+        req.userId = decoded.userId;  // Attach the tutor ID to the request object
         next();  // Continue to the next middleware or route handler
 
     } catch (error) {

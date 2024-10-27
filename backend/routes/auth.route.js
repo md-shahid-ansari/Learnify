@@ -8,42 +8,25 @@ import {
     studentLogout,
     authStudent,
 
-    mentorRegister,
-    verifyMentorEmail,
-    mentorLogin,
-    mentorForgot,
-    mentorReset,
-    mentorLogout,
-    authMentor,
+    tutorRegister,
+    verifyTutorEmail,
+    tutorLogin,
+    tutorForgot,
+    tutorReset,
+    tutorLogout,
+    authTutor,
 
-    companyRegister,
-    verifyCompanyEmail,
-    companyLogin,
-    companyForgot,
-    companyReset,
-    companyLogout,
-    authCompany
+    adminRegister,
+    verifyAdminEmail,
+    adminLogin,
+    adminForgot,
+    adminReset,
+    adminLogout,
+    authAdmin
 } from "../controllers/auth.controllers.js";
-import { verifyCompany } from "../midlayer/verifyCompany.js";
+import { verifyAdmin } from "../midlayer/verifyAdmin.js";
 import { verifyStudent } from "../midlayer/verifyStudent.js";
-import { verifyMentor } from "../midlayer/verifyMentor.js";
-
-import { 
-    createProject,
-    fetchProjects,
-    
-    createChallenge,
-    fetchChallenges,
-    deleteChallenge,
-    updateChallenge,
- } from "../controllers/company.controller.js";
-
- import {
-    submitTaskRepo,
-    requestMentorHelp,
-    updateTaskStatus,
-    submitChallenge
- } from "../controllers/student.controller.js";
+import { verifyTutor } from "../midlayer/verifyTutor.js";
 
 
 const router = express.Router();
@@ -57,38 +40,23 @@ router.post("/student-reset/:token", studentReset);
 router.post("/student-logout", studentLogout);
 router.get("/student-auth", verifyStudent, authStudent);
 
-// Mentor Routes
-router.post("/mentor-register", mentorRegister);
-router.post("/mentor-verify", verifyMentorEmail);
-router.post("/mentor-login", mentorLogin);
-router.post("/mentor-forgot", mentorForgot);
-router.post("/mentor-reset/:token", mentorReset);
-router.post("/mentor-logout", mentorLogout);
-router.get("/mentor-auth", verifyMentor, authMentor);
+// Tutor Routes
+router.post("/tutor-register", tutorRegister);
+router.post("/tutor-verify", verifyTutorEmail);
+router.post("/tutor-login", tutorLogin);
+router.post("/tutor-forgot", tutorForgot);
+router.post("/tutor-reset/:token", tutorReset);
+router.post("/tutor-logout", tutorLogout);
+router.get("/tutor-auth", verifyTutor, authTutor);
 
-// Company Routes
-router.post("/company-register", companyRegister);
-router.post("/company-verify", verifyCompanyEmail);
-router.post("/company-login", companyLogin);
-router.post("/company-forgot", companyForgot);
-router.post("/company-reset/:token", companyReset);
-router.post("/company-logout", companyLogout);
-router.get("/company-auth", verifyCompany, authCompany);
+// Admin Routes
+router.post("/admin-register", adminRegister);
+router.post("/admin-verify", verifyAdminEmail);
+router.post("/admin-login", adminLogin);
+router.post("/admin-forgot", adminForgot);
+router.post("/admin-reset/:token", adminReset);
+router.post("/admin-logout", adminLogout);
+router.get("/admin-auth", verifyAdmin, authAdmin);
 
-
-
-router.post("/create-project", createProject);
-router.post("/fetch-projects", fetchProjects);
-
-
-router.post('/fetch-challenges', fetchChallenges);
-router.post('/create-challenge', createChallenge);
-router.put('/update-challenge/:id', updateChallenge);
-router.delete('/delete-challenge/:id', deleteChallenge);
-
-router.post('/submit-task-repo', submitTaskRepo);
-router.post('/request-mentor-help', requestMentorHelp);
-router.post('/update-task-status', updateTaskStatus);
-router.post('/submit-challenge', submitChallenge);
 
 export default router;
