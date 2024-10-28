@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import TopicForm from './TopicForm';  // Topic Component
-import QuizForm from './QuizForm';  // Quiz Component
+import TopicForm from './TopicForm'; // Import the TopicForm component
 
-const LessonForm = ({ index, lesson, onLessonChange }) => {
+const LessonForm = ({ index, lesson, onLessonChange , handleRemoveLesson}) => {
     const [lessonData, setLessonData] = useState(lesson);
 
     // Sync the local state with the incoming lesson prop
@@ -27,26 +26,18 @@ const LessonForm = ({ index, lesson, onLessonChange }) => {
         onLessonChange(index, updatedLessonData); // Update parent
     };
 
-    const handleAddQuiz = () => {
-        const newQuiz = { title: '', questions: [] };
-        const updatedQuizzes = [...(lessonData.quizzes || []), newQuiz];
-        const updatedLessonData = { ...lessonData, quizzes: updatedQuizzes };
-        
-        setLessonData(updatedLessonData);
-        onLessonChange(index, updatedLessonData); // Update parent
-    };
-
-    const handleRemoveQuiz = (quizIndex) => {
-        const updatedQuizzes = lessonData.quizzes.filter((_, i) => i !== quizIndex);
-        const updatedLessonData = { ...lessonData, quizzes: updatedQuizzes };
-
-        setLessonData(updatedLessonData);
-        onLessonChange(index, updatedLessonData); // Update parent
-    };
-
     return (
-        <div>
-            <h4>Lesson {index + 1}</h4>
+        <div className="">
+            <div className="flex items-center justify-between mb-2">
+                <h4 className="text-l font-semibold mb-3">Lesson {index + 1}</h4>
+                <button
+                    type="button"
+                    onClick={() => handleRemoveLesson(index)}
+                    className="mt-2 px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600"
+                >
+                    ×
+                </button>
+            </div>
             <input
                 type="text"
                 value={lessonData.title}
@@ -56,6 +47,7 @@ const LessonForm = ({ index, lesson, onLessonChange }) => {
                     onLessonChange(index, updatedLessonData); // Update parent
                 }}
                 placeholder="Lesson Title"
+                className="w-full mb-2 px-3 py-2 border rounded-md"
             />
             <textarea
                 value={lessonData.description}
@@ -65,11 +57,13 @@ const LessonForm = ({ index, lesson, onLessonChange }) => {
                     onLessonChange(index, updatedLessonData); // Update parent
                 }}
                 placeholder="Lesson Description"
+                className="w-full mb-4 px-3 py-2 border rounded-md"
             />
 
             {/* Render Topic Components */}
-            {lessonData.topics.map((topic, topicIndex) => (
-                <div key={topicIndex}>
+            <h2 className="text-lg font-bold mb-4">Topics</h2>
+            {lessonData.topics?.map((topic, topicIndex) => (
+                <div key={topicIndex} className="mb-4">
                     <TopicForm
                         index={topicIndex}
                         topic={topic}
@@ -82,37 +76,18 @@ const LessonForm = ({ index, lesson, onLessonChange }) => {
                             setLessonData(updatedLessonData);
                             onLessonChange(index, updatedLessonData); // Update parent
                         }}
+                        handleRemoveTopic={handleRemoveTopic}
                     />
-                    <button type="button" onClick={() => handleRemoveTopic(topicIndex)}>
-                        Remove Topic
-                    </button>
                 </div>
             ))}
 
-            {/* Render Quiz Components */}
-            {lessonData.quizzes.map((quiz, quizIndex) => (
-                <div key={quizIndex}>
-                    <QuizForm
-                        index={quizIndex}
-                        quiz={quiz}
-                        onQuizChange={(i, updatedQuiz) => {
-                            const updatedQuizzes = lessonData.quizzes.map((q, idx) =>
-                                idx === i ? updatedQuiz : q
-                            );
-                            const updatedLessonData = { ...lessonData, quizzes: updatedQuizzes };
-                            
-                            setLessonData(updatedLessonData);
-                            onLessonChange(index, updatedLessonData); // Update parent
-                        }}
-                    />
-                    <button type="button" onClick={() => handleRemoveQuiz(quizIndex)}>
-                        Remove Quiz
-                    </button>
-                </div>
-            ))}
-
-            <button type="button" onClick={handleAddTopic}>Add Topic</button>
-            <button type="button" onClick={handleAddQuiz}>Add Quiz</button>
+            <button
+                type="button"
+                onClick={handleAddTopic}
+                className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+            >
+                Add Topic
+            </button>
         </div>
     );
 };

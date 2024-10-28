@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const TopicForm = ({ index, topic, onTopicChange }) => {
+const TopicForm = ({ index, topic, onTopicChange, handleRemoveTopic }) => {
     const [topicData, setTopicData] = useState(topic || {
         title: '',
         content: '',
@@ -80,8 +80,17 @@ const TopicForm = ({ index, topic, onTopicChange }) => {
     };
 
     return (
-        <div>
-            <h5>Topic {index + 1}</h5>
+        <div className="">
+            <div className="flex items-center justify-between mb-2">
+                <h5 className="text-l font-semibold">Topic {index + 1}</h5>
+                <button
+                    type="button"
+                    onClick={() => handleRemoveTopic(index)}
+                    className="mt-2 px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600"
+                >
+                   ×
+                </button>
+            </div>
 
             {/* Topic Title */}
             <input
@@ -89,6 +98,7 @@ const TopicForm = ({ index, topic, onTopicChange }) => {
                 value={topicData.title || ''}
                 onChange={(e) => updateTopicData({ ...topicData, title: e.target.value })}
                 placeholder="Topic Title"
+                className="mt-2 mb-4 w-full p-2 border border-gray-300 rounded"
             />
 
             {/* Topic Content */}
@@ -96,74 +106,110 @@ const TopicForm = ({ index, topic, onTopicChange }) => {
                 value={topicData.content || ''}
                 onChange={(e) => updateTopicData({ ...topicData, content: e.target.value })}
                 placeholder="Topic Content"
+                className="mt-2 mb-4 w-full p-2 border border-gray-300 rounded"
             />
 
             {/* Learning Outcomes */}
-            <div>
-                <h6>Learning Outcomes</h6>
+            <div className="mb-4">
+                <h6 className="text-md font-semibold">Learning Outcomes</h6>
                 {(topicData.learningOutcomes || []).map((outcome, outcomeIndex) => (
-                    <div key={outcomeIndex}>
+                    <div key={outcomeIndex} className="flex items-center mb-2">
                         <input
                             type="text"
                             value={outcome}
                             onChange={(e) => handleOutcomeChange(outcomeIndex, e.target.value)}
                             placeholder={`Outcome ${outcomeIndex + 1}`}
+                            className="mr-2 w-full p-2 border border-gray-300 rounded"
                         />
-                        <button type="button" onClick={() => handleRemoveOutcome(outcomeIndex)}>
-                            Remove Outcome
+                        <button
+                            type="button"
+                            onClick={() => handleRemoveOutcome(outcomeIndex)}
+                            className="mt-2 px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600"
+                        >
+                            ×
                         </button>
                     </div>
                 ))}
-                <button type="button" onClick={handleAddOutcome}>Add Outcome</button>
+                <button
+                    type="button"
+                    onClick={handleAddOutcome}
+                    className="mt-2 p-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                >
+                    Add Outcome
+                </button>
             </div>
 
             {/* Add Images */}
-            <div>
-                <h6>Images</h6>
+            <div className="mb-4">
+                <h6 className="text-md font-semibold">Images</h6>
                 {(topicData.images || []).map((image, imageIndex) => (
-                    <div key={imageIndex}>
+                    <div key={imageIndex} className="flex items-center mb-2">
                         <input
                             type="text"
                             value={image.title}
                             onChange={(e) => handleImageChange(imageIndex, 'title', e.target.value)}
                             placeholder={`Image Title ${imageIndex + 1}`}
+                            className="mr-2 w-full p-2 border border-gray-300 rounded"
                         />
                         <input
                             type="file"
                             onChange={(e) => handleImageChange(imageIndex, 'file', e.target.files[0])}
+                            className="mr-2"
                         />
-                        {image.file && <p>{image.file.name}</p>}
-                        <button type="button" onClick={() => handleRemoveImage(imageIndex)}>
-                            Remove Image
+                        {image.file && <p className="text-gray-500">{image.file.name}</p>}
+                        <button
+                            type="button"
+                            onClick={() => handleRemoveImage(imageIndex)}
+                            className="mt-2 px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600"
+                        >
+                            ×
                         </button>
                     </div>
                 ))}
-                <button type="button" onClick={handleAddImage}>Add Image</button>
+                <button
+                    type="button"
+                    onClick={handleAddImage}
+                    className="mt-2 p-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                >
+                    Add Image
+                </button>
             </div>
 
             {/* Add Videos */}
             <div>
-                <h6>Videos</h6>
+                <h6 className="text-md font-semibold">Videos</h6>
                 {(topicData.videos || []).map((video, videoIndex) => (
-                    <div key={videoIndex}>
+                    <div key={videoIndex} className="flex items-center mb-2">
                         <input
                             type="text"
                             value={video.title}
                             onChange={(e) => handleVideoChange(videoIndex, 'title', e.target.value)}
                             placeholder={`Video Title ${videoIndex + 1}`}
+                            className="mr-2 w-full p-2 border border-gray-300 rounded"
                         />
                         <input
                             type="text"
                             value={video.url}
                             onChange={(e) => handleVideoChange(videoIndex, 'url', e.target.value)}
                             placeholder="Video URL"
+                            className="mr-2 w-full p-2 border border-gray-300 rounded"
                         />
-                        <button type="button" onClick={() => handleRemoveVideo(videoIndex)}>
-                            Remove Video
+                        <button
+                            type="button"
+                            onClick={() => handleRemoveVideo(videoIndex)}
+                            className="mt-2 px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600"
+                        >
+                            ×
                         </button>
                     </div>
                 ))}
-                <button type="button" onClick={handleAddVideo}>Add Video</button>
+                <button
+                    type="button"
+                    onClick={handleAddVideo}
+                    className="mt-2 p-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                >
+                    Add Video
+                </button>
             </div>
         </div>
     );

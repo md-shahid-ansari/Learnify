@@ -43,8 +43,8 @@ const TutorSidebar = () => {
             </Link>
           </li>
           <li>
-            <Link to="tutor-learning" className="block py-2 px-4 rounded hover:bg-gray-700">
-              Learnings
+            <Link to="tutor-course" className="block py-2 px-4 rounded hover:bg-gray-700">
+             Manage Courses
             </Link>
           </li>
         </ul>

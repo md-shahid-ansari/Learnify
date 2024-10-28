@@ -1,22 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import './StudentDashboard.css';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { IsStudentSessionLive } from '../utils/IsStudentSessionLive';
-import axios from 'axios';
-
-const URL = process.env.REACT_APP_BACKEND_URL; // Replace with your actual backend URL
 
 const StudentDashboard = () => {
     const navigate = useNavigate();
     const [studentData, setStudentData] = useState({
-        studentName: 'John Doe', // Example name
-        learningPaths: [], // Initialize with an empty array
+        studentName: 'John Doe',
+        learningPaths: [],
     });
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [projects, setProjects] = useState([]);
-    const [challenges, setChallenges] = useState([]);
-    
+
     useEffect(() => {
         let isMounted = true;
 
@@ -32,115 +26,85 @@ const StudentDashboard = () => {
                 return;
             }
 
-            // Ensure studentData is set correctly
             setStudentData({
                 ...studentData,
-                learningPaths: studentData.learningPaths || [], // Ensure learningPaths is an array
+                learningPaths: studentData.learningPaths || [],
             });
         };
 
-        const fetchProjectsAndChallenges = async () => {
-            try {
-                const [projectsResponse, challengesResponse] = await Promise.all([
-                    axios.post(`${URL}/api/auth/fetch-projects`),
-                    axios.post(`${URL}/api/auth/fetch-challenges`),
-                ]);
+        authenticate().then(() => setLoading(false));
 
-                setProjects(projectsResponse.data.data);
-                setChallenges(challengesResponse.data);
-            } catch (err) {
-                setError('Failed to fetch projects and challenges. Please try again later.');
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        authenticate().then(fetchProjectsAndChallenges);
-        
         return () => {
-            isMounted = false; // Clean up the effect
+            isMounted = false;
         };
     }, [navigate]);
 
-    // Example learning paths data (this will be replaced with actual API data)
+    // Example learning paths and courses data
     const exampleLearningPaths = [
         { name: 'Web Development', progress: 70, nextModule: 'JavaScript Frameworks' },
         { name: 'Data Science', progress: 50, nextModule: 'Machine Learning Basics' },
         { name: 'Mobile App Development', progress: 30, nextModule: 'React Native Basics' },
     ];
 
-    if (loading) return <div>Loading...</div>;
-    if (error) return <div>{error}</div>;
+    const exampleCourses = [
+        { name: 'Introduction to Python', progress: 85 },
+        { name: 'React Fundamentals', progress: 45 },
+        { name: 'Machine Learning 101', progress: 20 },
+    ];
 
-    // Use optional chaining to safely access learningPaths
+    if (loading) return <div className="flex justify-center items-center h-screen">Loading...</div>;
+    if (error) return <div className="text-red-600 text-center">{error}</div>;
+
     const learningPaths = studentData.learningPaths?.length > 0 ? studentData.learningPaths : exampleLearningPaths;
 
     return (
-        <div className="student-dashboard">
-            <nav className="student-dashboard-header">
-                <h1>Welcome {studentData.studentName}</h1>
-                <p>Here are your ongoing projects, learning paths, and challenges.</p>
+        <div className="student-dashboard p-8 bg-gray-50 min-h-screen">
+            <nav className="text-center py-4 mb-8">
+                <h1 className="text-3xl font-semibold">Welcome, {studentData.studentName}</h1>
+                <p className="text-gray-600">Track your progress on learning paths and courses.</p>
             </nav>
 
-            {/* Ongoing Projects */}
-            <section className="ongoing-projects">
-                <h2>Ongoing Projects</h2>
-                {projects.length > 0 ? (
-                    <ul>
-                        {projects.map((project) => (
-                            <li key={project.projectId} className="project-card">
-                                <h3>
-                                    <Link to={`/project/${project.projectId}`}>{project.projectTitle}</Link>
-                                </h3>
-                                <p>Status: {project.status}</p>
-                                <p>Tasks Assigned: {project.taskList.length}</p>
-                                {/* <button className="submit-github-btn">Submit GitHub Link</button> */}
-                            </li>
-                        ))}
-                    </ul>
-                ) : (
-                    <p>No ongoing projects available at the moment.</p>
-                )}
-            </section>
-
-            {/* Learning Paths */}
-            <section className="learning-paths">
-                <h2>Learning Paths</h2>
-                {learningPaths.length > 0 ? (
-                    <ul>
-                        {learningPaths.map((path, index) => (
-                            <li key={index} className="path-card">
-                                <h3>{path.name}</h3>
-                                <div className="progress-container">
-                                    <div className="progress-bar" style={{ width: `${path.progress}%` }}></div>
-                                    <span>{path.progress}%</span>
+            {/* Learning Paths Section */}
+            <section className="mb-10">
+                <h2 className="text-2xl font-bold mb-4">Learning Paths</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {learningPaths.map((path, index) => (
+                        <div key={index} className="p-4 bg-white shadow rounded-lg">
+                            <h3 className="text-xl font-semibold">{path.name}</h3>
+                            <div className="relative pt-4">
+                                <div className="w-full h-3 bg-gray-200 rounded-full overflow-hidden">
+                                    <div
+                                        className="h-full bg-blue-500 rounded-full"
+                                        style={{ width: `${path.progress}%` }}
+                                    ></div>
                                 </div>
-                                <p>Next Module: {path.nextModule}</p>
-                            </li>
-                        ))}
-                    </ul>
-                ) : (
-                    <p>No learning paths available at the moment.</p>
-                )}
+                                <span className="text-gray-600">{path.progress}% complete</span>
+                            </div>
+                            <p className="mt-2 text-gray-500">Next Module: {path.nextModule}</p>
+                        </div>
+                    ))}
+                </div>
             </section>
 
-            {/* Challenges */}
-            <section className="ongoing-challenges">
-                <h2>Ongoing Challenges</h2>
-                {challenges.length > 0 ? (
-                    <ul>
-                        {challenges.map((challenge) => (
-                            <li key={challenge.challengeId} className="challenge-card">
-                                <h3>
-                                    <Link to={`/challenge/${challenge.challengeId}`}>{challenge.title}</Link>
-                                </h3>
-                                <p>Deadline: {challenge.deadline}</p>
-                            </li>
-                        ))}
-                    </ul>
-                ) : (
-                    <p>No ongoing challenges available at the moment.</p>
-                )}
+            {/* Courses Section */}
+            <section>
+                <h2 className="text-2xl font-bold mb-4">Your Courses</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {exampleCourses.map((course, index) => (
+                        <div key={index} className="p-4 bg-white shadow rounded-lg">
+                            <h3 className="text-xl font-semibold">{course.name}</h3>
+                            <div className="relative pt-4">
+                                <div className="w-full h-3 bg-gray-200 rounded-full overflow-hidden">
+                                    <div
+                                        className="h-full bg-green-500 rounded-full"
+                                        style={{ width: `${course.progress}%` }}
+                                    ></div>
+                                </div>
+                                <span className="text-gray-600">{course.progress}% complete</span>
+                            </div>
+                        </div>
+                    ))}
+                </div>
             </section>
         </div>
     );

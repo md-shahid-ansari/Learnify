@@ -47,6 +47,11 @@ const AdminSidebar = () => {
               Manage Users
             </Link>
           </li>
+          <li>
+            <Link to="admin-course" className="block py-2 px-4 rounded hover:bg-gray-700">
+              Manage Courses
+            </Link>
+          </li>
         </ul>
       </nav>
       <div className="mt-4">

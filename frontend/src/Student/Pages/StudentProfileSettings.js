@@ -1,19 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import './StudentProfileSettings.css'; // Ensure to create and style this CSS file
 
-// Custom hook to simulate fetching student data
 const useFetchStudentData = () => {
     const [student, setStudent] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        // Simulate an API call
         const fetchData = async () => {
             try {
-                // Simulate a delay
                 await new Promise((resolve) => setTimeout(resolve, 1000));
-                // Mock student data
                 const mockData = {
                     name: 'John Doe',
                     email: 'john.doe@example.com',
@@ -27,7 +22,6 @@ const useFetchStudentData = () => {
                 setLoading(false);
             }
         };
-
         fetchData();
     }, []);
 
@@ -53,7 +47,6 @@ const StudentProfileSettings = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        // Logic to handle form submission
         console.log({
             name,
             email,
@@ -68,87 +61,84 @@ const StudentProfileSettings = () => {
         const file = e.target.files[0];
         const reader = new FileReader();
         reader.onloadend = () => {
-            setProfilePicture(reader.result); // Set the preview of the profile picture
+            setProfilePicture(reader.result);
         };
         reader.readAsDataURL(file);
     };
 
-    if (loading) return <div>Loading...</div>;
-    if (error) return <div>{error}</div>;
+    if (loading) return <div className="text-center mt-10">Loading...</div>;
+    if (error) return <div className="text-red-500 text-center mt-10">{error}</div>;
 
     return (
-        <div className="profile-settings">
-            <h1>Profile Settings</h1>
-            <form onSubmit={handleSubmit}>
-                <div className="form-group">
-                    <label htmlFor="profilePicture">Profile Picture</label>
-                    <div className="profile-picture-preview">
-                        <img src={profilePicture} alt="Profile" />
-                    </div>
-                    <input 
-                        type="file" 
-                        id="profilePicture" 
-                        onChange={handleProfilePictureChange} 
+        <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-lg mt-10">
+            <h1 className="text-2xl font-bold text-center text-gray-800 mb-6">Profile Settings</h1>
+            <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="flex flex-col items-center">
+                    <img
+                        src={profilePicture}
+                        alt="Profile"
+                        className="w-24 h-24 rounded-full border-2 border-gray-300"
+                    />
+                    <input
+                        type="file"
+                        onChange={handleProfilePictureChange}
                         accept="image/*"
+                        className="mt-2 text-sm text-gray-600"
                     />
                 </div>
 
-                <div className="form-group">
-                    <label htmlFor="name">Full Name</label>
-                    <input 
-                        type="text" 
-                        id="name" 
-                        value={name} 
-                        onChange={(e) => setName(e.target.value)} 
-                        required 
+                <div>
+                    <label className="block text-gray-700">Full Name</label>
+                    <input
+                        type="text"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        required
+                        className="w-full p-2 mt-1 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     />
                 </div>
 
-                <div className="form-group">
-                    <label htmlFor="email">Email</label>
-                    <input 
-                        type="email" 
-                        id="email" 
-                        value={email} 
-                        onChange={(e) => setEmail(e.target.value)} 
-                        required 
+                <div>
+                    <label className="block text-gray-700">Email</label>
+                    <input
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                        className="w-full p-2 mt-1 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     />
                 </div>
 
-                <div className="form-group">
-                    <label htmlFor="password">New Password</label>
-                    <input 
-                        type="password" 
-                        id="password" 
-                        value={password} 
-                        onChange={(e) => setPassword(e.target.value)} 
+                <div>
+                    <label className="block text-gray-700">New Password</label>
+                    <input
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="w-full p-2 mt-1 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     />
                 </div>
 
-                <div className="form-group">
-                    <label htmlFor="contact">Contact Number</label>
-                    <input 
-                        type="tel" 
-                        id="contact" 
-                        value={contact} 
-                        onChange={(e) => setContact(e.target.value)} 
-                        required 
+                <div>
+                    <label className="block text-gray-700">Contact Number</label>
+                    <input
+                        type="tel"
+                        value={contact}
+                        onChange={(e) => setContact(e.target.value)}
+                        required
+                        className="w-full p-2 mt-1 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     />
                 </div>
 
-                <button type="submit" className="save-button">Save Changes</button>
+                <button
+                    type="submit"
+                    className="w-full py-2 mt-4 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
+                >
+                    Save Changes
+                </button>
             </form>
         </div>
     );
 };
 
-// Example Usage
-const App = () => {
-    return (
-        <div className="app">
-            <StudentProfileSettings />
-        </div>
-    );
-};
-
-export default App;
+export default StudentProfileSettings;

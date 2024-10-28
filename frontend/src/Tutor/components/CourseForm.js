@@ -1,58 +1,75 @@
 import React, { useState } from 'react';
-import ModuleForm from './ModuleForm';  // Module Component
+import ModuleForm from './ModuleForm';  // Import the ModuleForm component
 
-const CourseForm = ({ index, course, onCourseChange }) => {
+const CourseForm = ({ course, onCourseChange }) => {
     const [courseData, setCourseData] = useState(course);
 
-    const handleModuleChange = (moduleIndex, updatedModule) => {
-        const updatedModules = courseData.modules.map((module, i) =>
-            i === moduleIndex ? updatedModule : module
-        );
-        setCourseData({ ...courseData, modules: updatedModules });
-        onCourseChange(index, { ...courseData, modules: updatedModules });
+    // Helper function to handle changes to title, description, and modules
+    const handleInputChange = (field, value) => {
+        const updatedCourseData = { ...courseData, [field]: value };
+        setCourseData(updatedCourseData);
+        onCourseChange(updatedCourseData); // Update course state in TutorCourse
     };
 
+    // Add a new module
     const handleAddModule = () => {
         const newModule = { title: '', description: '', topics: [], quizzes: [] };
-        setCourseData({ ...courseData, modules: [...courseData.modules, newModule] });
+        handleInputChange("modules", [...courseData.modules, newModule]);
     };
 
+    // Remove a module by index
     const handleRemoveModule = (moduleIndex) => {
         const updatedModules = courseData.modules.filter((_, i) => i !== moduleIndex);
-        setCourseData({ ...courseData, modules: updatedModules });
-        onCourseChange(index, { ...courseData, modules: updatedModules });  // Update parent
+        handleInputChange("modules", updatedModules);
     };
 
     return (
-        <div>
-            <h3>Course {index + 1}</h3>
+        <div className="p-4 border border-gray-300 rounded-lg mb-6 bg-white shadow-md">
+            <h3 className="text-lg font-semibold mb-4">Course Details</h3>
+            
+            {/* Course Title Input */}
             <input
                 type="text"
                 value={courseData.title}
-                onChange={(e) => setCourseData({ ...courseData, title: e.target.value })}
+                onChange={(e) => handleInputChange("title", e.target.value)}
                 placeholder="Course Title"
+                className="w-full mb-3 px-3 py-2 border rounded-md"
             />
+            
+            {/* Course Description Textarea */}
             <textarea
                 value={courseData.description}
-                onChange={(e) => setCourseData({ ...courseData, description: e.target.value })}
+                onChange={(e) => handleInputChange("description", e.target.value)}
                 placeholder="Course Description"
+                className="w-full mb-4 px-3 py-2 border rounded-md"
             />
 
-            {/* Render Module Components */}
+            {/* Module Section */}
+            <h2 className="text-lg font-bold mb-4">Modules</h2>
             {courseData.modules.map((module, moduleIndex) => (
-                <div key={moduleIndex}>
+                <div key={moduleIndex} className="mb-4">
                     <ModuleForm
                         index={moduleIndex}
                         module={module}
-                        onModuleChange={handleModuleChange}
+                        onModuleChange={(updatedModule) => {
+                            const updatedModules = courseData.modules.map((m, i) =>
+                                i === moduleIndex ? updatedModule : m
+                            );
+                            handleInputChange("modules", updatedModules);
+                        }}
+                        handleRemoveModule={handleRemoveModule}
                     />
-                    <button type="button" onClick={() => handleRemoveModule(moduleIndex)}>
-                        Remove Module
-                    </button>
                 </div>
             ))}
 
-            <button type="button" onClick={handleAddModule}>Add Module</button>
+            {/* Add Module Button */}
+            <button
+                type="button"
+                onClick={handleAddModule}
+                className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+            >
+                Add Module
+            </button>
         </div>
     );
 };

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const QuizForm = ({ index, quiz, onQuizChange }) => {
+const QuizForm = ({ index, quiz, onQuizChange, handleRemoveQuiz }) => {
     const [quizData, setQuizData] = useState(quiz || {
         title: '',
         questions: []
@@ -61,19 +61,38 @@ const QuizForm = ({ index, quiz, onQuizChange }) => {
     };
 
     return (
-        <div>
-            <h5>Quiz {index + 1}</h5>
+        <div className="mb-6">
+            <div className="flex items-center justify-between mb-2">
+                <h5 className="text-l font-semibold mb-2">Quiz {index + 1}</h5>
+                <button
+                    type="button"
+                    onClick={() => handleRemoveQuiz(index)}
+                    className="mt-2 px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600"
+                >
+                    ×
+                </button>
+                </div>
             <input
                 type="text"
                 value={quizData.title}
                 onChange={(e) => updateQuizData({ ...quizData, title: e.target.value })}
                 placeholder="Quiz Title"
+                className="w-full p-2 mb-4 border border-gray-300 rounded"
             />
 
             {/* Render Questions */}
             {quizData.questions.map((question, questionIndex) => (
-                <div key={questionIndex}>
-                    <h6>Question {questionIndex + 1}</h6>
+                <div key={questionIndex} className="mb-4">
+                    <div className="flex items-center justify-between mb-2">
+                        <h5 className="text-l font-semibold mb-2">Question {questionIndex + 1}</h5>
+                        <button
+                            type="button"
+                            onClick={() => handleRemoveQuestion(questionIndex)}
+                            className="mt-2 px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600"
+                        >
+                            ×
+                        </button>
+                    </div>
                     <textarea
                         value={question.questionText}
                         onChange={(e) =>
@@ -83,6 +102,7 @@ const QuizForm = ({ index, quiz, onQuizChange }) => {
                             })
                         }
                         placeholder="Question Text"
+                        className="w-full p-2 mb-2 border border-gray-300 rounded"
                     />
                     <select
                         value={question.questionType}
@@ -92,6 +112,7 @@ const QuizForm = ({ index, quiz, onQuizChange }) => {
                                 questionType: e.target.value
                             })
                         }
+                        className="mb-2 p-2 border border-gray-300 rounded"
                     >
                         <option value="multiple-choice">Multiple Choice</option>
                         <option value="true/false">True/False</option>
@@ -101,7 +122,7 @@ const QuizForm = ({ index, quiz, onQuizChange }) => {
                     {/* Multiple-Choice Options */}
                     {question.questionType === 'multiple-choice' &&
                         question.options.map((option, optionIndex) => (
-                            <div key={optionIndex}>
+                            <div key={optionIndex} className="flex items-center justify-between mb-2">
                                 <input
                                     type="text"
                                     value={option}
@@ -115,16 +136,25 @@ const QuizForm = ({ index, quiz, onQuizChange }) => {
                                         });
                                     }}
                                     placeholder={`Option ${optionIndex + 1}`}
+                                    className="mr-2 w-full p-2 border border-gray-300 rounded"
                                 />
-                                <button type="button" onClick={() => handleRemoveOption(questionIndex, optionIndex)}>
-                                    Remove Option
+                                <button
+                                    type="button"
+                                    onClick={() => handleRemoveOption(questionIndex, optionIndex)}
+                                    className="mt-2 px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600"
+                                >
+                                    ×
                                 </button>
                             </div>
                         ))}
 
                     {/* Button to add more options for multiple-choice */}
                     {question.questionType === 'multiple-choice' && (
-                        <button type="button" onClick={() => handleAddOption(questionIndex)}>
+                        <button
+                            type="button"
+                            onClick={() => handleAddOption(questionIndex)}
+                            className="mt-2 mb-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                        >
                             Add Option
                         </button>
                     )}
@@ -140,16 +170,16 @@ const QuizForm = ({ index, quiz, onQuizChange }) => {
                             })
                         }
                         placeholder="Correct Answer"
+                        className="w-full p-2 mb-2 border border-gray-300 rounded"
                     />
-
-                    {/* Remove Question Button */}
-                    <button type="button" onClick={() => handleRemoveQuestion(questionIndex)}>
-                        Remove Question
-                    </button>
                 </div>
             ))}
 
-            <button type="button" onClick={handleAddQuestion}>
+            <button
+                type="button"
+                onClick={handleAddQuestion}
+                className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            >
                 Add Question
             </button>
         </div>
