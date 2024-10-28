@@ -1,9 +1,8 @@
 import React from 'react';
-import MentorSidebar from './MentorSidebar';
+import MentorSidebar from './TutorSidebar';
 import { Outlet,Link } from 'react-router-dom';
-import './MentorHome.css';
 
-const MentorHome = () => {
+const TutorHome = () => {
     return (
         <div className="mentor-home">
             <nav className="mentor-home-header">
@@ -22,7 +21,7 @@ const MentorHome = () => {
     );
 };
 
-export default MentorHome;
+export default TutorHome;
 
 
 

@@ -1,6 +1,5 @@
 import React , { useState } from 'react';
 import { Link , useNavigate} from 'react-router-dom';
-import './MentorHome.css';
 import axios from 'axios';
 
 const URL = process.env.REACT_APP_BACKEND_URL; // Replace with your actual backend URL

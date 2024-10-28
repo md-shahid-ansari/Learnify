@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import CourseForm from '../components/CourseForm'; // Course component to handle the course-level actions
 
-const MentorLearningPath = () => {
+const TutorLearningPath = () => {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [certificates, setCertificates] = useState(['']);
@@ -117,4 +117,4 @@ const MentorLearningPath = () => {
     );
 };
 
-export default MentorLearningPath;
+export default TutorLearningPath;

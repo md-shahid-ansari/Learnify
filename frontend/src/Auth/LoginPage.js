@@ -111,6 +111,15 @@ const LoginPage = () => {
               className="mt-1 block w-full border border-gray-400 rounded-lg p-2 bg-white text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
+          <div className="form-group">
+              <label className="block text-sm font-medium">I am a:</label>
+              <select name="role" value={formData.role} onChange={handleChange} required className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-indigo-200">
+                <option value="">Select Role</option>
+                <option value="Student">Student</option>
+                <option value="Tutor">Tutor</option>
+                <option value="Admin">Admin</option>
+              </select>
+            </div>
           <button type="submit" className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 rounded" disabled={loadingLogin}>
             {loadingLogin ? 'Logging in...' : 'Login'}
           </button>

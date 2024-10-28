@@ -16,6 +16,9 @@ import AdminProfile from './Admin/Pages/AdminProfile';
 
 import LoginPage from './Auth/LoginPage';
 import RegistrationPage from './Auth/RegistrationPage';
+import AdminResetPage from './Auth/AdminResetPage';
+import StudentResetPage from './Auth/StudentResetPage';
+import TutorResetPage from './Auth/TutorResetPage';
 import Courses from './HomePage/Components/Courses';
 
 import axios from 'axios';
@@ -33,6 +36,9 @@ const App = () => {
             <Route path="/courses" element={<Courses />} />
             <Route path="/login-page" element={<LoginPage />} />
             <Route path="/register-page" element={<RegistrationPage />} />
+            <Route path="/admin-reset/:token" element={<AdminResetPage />} />
+            <Route path="/student-reset/:token" element={<StudentResetPage />} />
+            <Route path="/tutor-reset/:token" element={<TutorResetPage />} />
           </Route>
 
           <Route path="/student-home" element={<StudentHome />}>

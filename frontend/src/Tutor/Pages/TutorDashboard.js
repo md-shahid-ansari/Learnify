@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import './MentorDashboard.css'; // Ensure to create and style this CSS file
 
-const MentorDashboard = () => {
+const TutorDashboard = () => {
     const [projects, setProjects] = useState([]);
     const [challenges, setChallenges] = useState([]);
     const [feedbackRequests, setFeedbackRequests] = useState([]);
@@ -133,4 +133,4 @@ const MentorDashboard = () => {
     );
 };
 
-export default MentorDashboard;
+export default TutorDashboard;

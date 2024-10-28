@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './MentorProfileSettings.css'; // Ensure to create and style this CSS file
 
-const MentorProfileSettings = () => {
+const TutorProfileSettings = () => {
     // Sample mentor details
     const [mentor, setMentor] = useState({
         name: 'John Doe',
@@ -146,4 +146,4 @@ const MentorProfileSettings = () => {
     );
 };
 
-export default MentorProfileSettings;
+export default TutorProfileSettings;
