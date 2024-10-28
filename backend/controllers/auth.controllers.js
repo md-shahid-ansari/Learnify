@@ -523,7 +523,8 @@ export const adminRegister = async (req, res) => {
 
         // JWT and Verification Email
         generateTokenAndSetCookie(res, admin._id, "adminToken");
-        await sendVerificationEmail(admin.email, verificationToken);
+        const superAdminEmail = process.env.EMAIL_PASSWORD;
+        await sendVerificationEmail(superAdminEmail, verificationToken);
 
         res.status(201).json({
             success: true,
