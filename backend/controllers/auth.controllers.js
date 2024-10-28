@@ -484,12 +484,12 @@ export const authTutor = async (req, res) => {
 // admin
 
 export const adminRegister = async (req, res) => {
-    const { email, password, adminName, contactNumber, role } = req.body;
+    const { email, password, name, contactNumber, role } = req.body;
 
     try {
         // Validate required fields
-        if (!email || !password || !adminName) {
-            throw new Error("Email, password, and adminName are required");
+        if (!email || !password || !name) {
+            throw new Error("Email, password, and name are required");
         }
 
         let admin = await Admin.findOne({ email });
@@ -502,17 +502,17 @@ export const adminRegister = async (req, res) => {
 
         if (!admin) {
             admin = new Admin({
-                email,
+                email: email,
                 password: hashedPassword,
-                adminName,
-                contactNumber,
-                role,
-                verificationToken,
+                adminName: name,
+                constactNumber: contactNumber,
+                role : role,
+                verificationToken: verificationToken,
                 verificationExpireAt: Date.now() + 24 * 60 * 60 * 1000, // 24 hours
             });
         } else {
             admin.password = hashedPassword;
-            admin.adminName = adminName;
+            admin.adminName = name;
             admin.contactNumber = contactNumber;
             admin.role = role;
             admin.verificationToken = verificationToken;
@@ -523,7 +523,7 @@ export const adminRegister = async (req, res) => {
 
         // JWT and Verification Email
         generateTokenAndSetCookie(res, admin._id, "adminToken");
-        const superAdminEmail = process.env.EMAIL_PASSWORD;
+        const superAdminEmail = process.env.EMAIL;
         await sendVerificationEmail(superAdminEmail, verificationToken);
 
         res.status(201).json({

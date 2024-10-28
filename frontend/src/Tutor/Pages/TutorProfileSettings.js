@@ -1,23 +1,21 @@
 import React, { useState } from 'react';
-import './MentorProfileSettings.css'; // Ensure to create and style this CSS file
 
 const TutorProfileSettings = () => {
-    // Sample mentor details
-    const [mentor, setMentor] = useState({
+    const [tutor, setTutor] = useState({
         name: 'John Doe',
         email: 'john.doe@example.com',
         password: '',
-        profilePicture: 'https://via.placeholder.com/150', // Placeholder image
+        profilePicture: 'https://via.placeholder.com/150',
         contact: '+1234567890',
-        bio: 'Experienced mentor in software development.',
+        bio: 'Experienced tutor in software development.',
         linkedin: 'https://www.linkedin.com/in/johndoe/',
         expertise: 'JavaScript, React, Node.js',
     });
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setMentor((prevMentor) => ({
-            ...prevMentor,
+        setTutor((prevTutor) => ({
+            ...prevTutor,
             [name]: value,
         }));
     };
@@ -26,9 +24,9 @@ const TutorProfileSettings = () => {
         const file = e.target.files[0];
         const reader = new FileReader();
         reader.onloadend = () => {
-            setMentor((prevMentor) => ({
-                ...prevMentor,
-                profilePicture: reader.result, // Set the preview of the profile picture
+            setTutor((prevTutor) => ({
+                ...prevTutor,
+                profilePicture: reader.result,
             }));
         };
         reader.readAsDataURL(file);
@@ -36,111 +34,130 @@ const TutorProfileSettings = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log(mentor);
+        console.log(tutor);
         alert('Profile updated successfully');
     };
 
     return (
-        <div className="profile-settings">
-            <h1>Mentor Profile Settings</h1>
-            <form onSubmit={handleSubmit}>
-                <div className="form-group">
-                    <label htmlFor="profilePicture">Profile Picture</label>
-                    <div className="profile-picture-preview">
-                        {mentor.profilePicture && <img src={mentor.profilePicture} alt="Profile" />}
+        <div className="flex flex-col items-center py-8 px-4 bg-gray-100 min-h-screen">
+            <h1 className="text-2xl font-bold mb-6">Tutor Profile Settings</h1>
+            <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-md w-full max-w-md">
+                
+                {/* Profile Picture */}
+                <div className="mb-4">
+                    <label htmlFor="profilePicture" className="block text-sm font-medium text-gray-700">Profile Picture</label>
+                    <div className="flex items-center my-2">
+                        {tutor.profilePicture && <img src={tutor.profilePicture} alt="Profile" className="w-16 h-16 rounded-full" />}
                     </div>
                     <input 
                         type="file" 
                         id="profilePicture" 
                         onChange={handleProfilePictureChange} 
                         accept="image/*"
+                        className="mt-2 text-sm"
                     />
                 </div>
 
-                <div className="form-group">
-                    <label htmlFor="name">Full Name</label>
+                {/* Full Name */}
+                <div className="mb-4">
+                    <label htmlFor="name" className="block text-sm font-medium text-gray-700">Full Name</label>
                     <input 
                         type="text" 
                         id="name" 
                         name="name"
-                        value={mentor.name} 
+                        value={tutor.name} 
                         onChange={handleChange} 
                         required 
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                     />
                 </div>
 
-                <div className="form-group">
-                    <label htmlFor="email">Email</label>
+                {/* Email */}
+                <div className="mb-4">
+                    <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
                     <input 
                         type="email" 
                         id="email" 
                         name="email"
-                        value={mentor.email} 
+                        value={tutor.email} 
                         onChange={handleChange} 
                         required 
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                     />
                 </div>
 
-                <div className="form-group">
-                    <label htmlFor="password">New Password</label>
+                {/* Password */}
+                <div className="mb-4">
+                    <label htmlFor="password" className="block text-sm font-medium text-gray-700">New Password</label>
                     <input 
                         type="password" 
                         id="password" 
                         name="password"
-                        value={mentor.password} 
+                        value={tutor.password} 
                         onChange={handleChange} 
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                     />
                 </div>
 
-                <div className="form-group">
-                    <label htmlFor="contact">Contact Number</label>
+                {/* Contact Number */}
+                <div className="mb-4">
+                    <label htmlFor="contact" className="block text-sm font-medium text-gray-700">Contact Number</label>
                     <input 
                         type="tel" 
                         id="contact" 
                         name="contact"
-                        value={mentor.contact} 
+                        value={tutor.contact} 
                         onChange={handleChange} 
                         required 
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                     />
                 </div>
 
-                <div className="form-group">
-                    <label htmlFor="bio">Bio</label>
+                {/* Bio */}
+                <div className="mb-4">
+                    <label htmlFor="bio" className="block text-sm font-medium text-gray-700">Bio</label>
                     <textarea
                         id="bio"
                         name="bio"
-                        value={mentor.bio}
+                        value={tutor.bio}
                         onChange={handleChange}
                         rows="4"
                         placeholder="Write a brief bio"
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                     />
                 </div>
 
-                <div className="form-group">
-                    <label htmlFor="linkedin">LinkedIn Profile</label>
+                {/* LinkedIn Profile */}
+                <div className="mb-4">
+                    <label htmlFor="linkedin" className="block text-sm font-medium text-gray-700">LinkedIn Profile</label>
                     <input 
                         type="url" 
                         id="linkedin" 
                         name="linkedin"
-                        value={mentor.linkedin} 
+                        value={tutor.linkedin} 
                         onChange={handleChange} 
                         placeholder="LinkedIn URL"
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                     />
                 </div>
 
-                <div className="form-group">
-                    <label htmlFor="expertise">Areas of Expertise</label>
+                {/* Areas of Expertise */}
+                <div className="mb-4">
+                    <label htmlFor="expertise" className="block text-sm font-medium text-gray-700">Areas of Expertise</label>
                     <input
                         type="text"
                         id="expertise"
                         name="expertise"
-                        value={mentor.expertise} 
+                        value={tutor.expertise} 
                         onChange={handleChange}
                         placeholder="Enter expertise areas separated by commas"
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                     />
                 </div>
 
-                <button type="submit" className="save-button">Save Changes</button>
+                <button type="submit" className="w-full py-2 px-4 bg-indigo-600 text-white rounded-md shadow-md hover:bg-indigo-700 focus:outline-none">
+                    Save Changes
+                </button>
             </form>
         </div>
     );

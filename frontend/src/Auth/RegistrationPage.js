@@ -123,6 +123,7 @@ const RegistrationPage = () => {
       <div className="w-full lg:w-1/2 flex justify-center items-center bg-white p-6">
         <div className="w-full max-w-md">
           <h2 className="text-2xl font-semibold text-center">Create an Account</h2>
+          {!isOtpSent && (
           <form className="mt-4 space-y-4" onSubmit={handleSubmit}>
             <div className="form-group">
               <label className="block text-sm font-medium">Full Name</label>
@@ -230,6 +231,7 @@ const RegistrationPage = () => {
               </Link>
             </p>
           </form>
+        )}
           {isOtpSent && (
             <form onSubmit={handleOtpSubmit} className="mt-6">
               <div className="form-group">

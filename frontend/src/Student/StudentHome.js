@@ -11,7 +11,7 @@ const StudentHome = () => {
       <nav className="student-home-header">
         <h1>ACADEMIX</h1>
         <div className="profile">
-          <Link to="student-profile-settings" className="profile-link">Student Profile</Link>
+          <Link to="student-profile" className="profile-link">Student Profile</Link>
         </div>
       </nav>
       <div className="main-content">

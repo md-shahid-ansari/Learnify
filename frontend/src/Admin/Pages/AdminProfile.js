@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import './AdminProfile.css'; // Add styles here
 
 const AdminProfileSettings = () => {
     const [adminData, setAdminData] = useState({
@@ -24,11 +23,12 @@ const AdminProfileSettings = () => {
     };
 
     return (
-        <div className="admin-profile-container">
-            <h1>Company Profile Settings</h1>
-            <form className="profile-form" onSubmit={handleSubmit}>
+        <div className="admin-profile-container max-w-md mx-auto p-6 bg-white shadow-md rounded-lg mt-10">
+            <h1 className="text-2xl font-bold mb-6 text-center">Company Profile Settings</h1>
+            <form className="profile-form space-y-4" onSubmit={handleSubmit}>
+                
                 <div className="form-group">
-                    <label htmlFor="name">Name:</label>
+                    <label htmlFor="name" className="block text-gray-700 font-medium mb-1">Name:</label>
                     <input
                         type="text"
                         id="name"
@@ -36,11 +36,12 @@ const AdminProfileSettings = () => {
                         value={adminData.name}
                         onChange={handleChange}
                         required
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
                     />
                 </div>
 
                 <div className="form-group">
-                    <label htmlFor="email">Email:</label>
+                    <label htmlFor="email" className="block text-gray-700 font-medium mb-1">Email:</label>
                     <input
                         type="email"
                         id="email"
@@ -48,11 +49,12 @@ const AdminProfileSettings = () => {
                         value={adminData.email}
                         onChange={handleChange}
                         required
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
                     />
                 </div>
 
                 <div className="form-group">
-                    <label htmlFor="password">Password:</label>
+                    <label htmlFor="password" className="block text-gray-700 font-medium mb-1">Password:</label>
                     <input
                         type="password"
                         id="password"
@@ -60,11 +62,12 @@ const AdminProfileSettings = () => {
                         value={adminData.password}
                         onChange={handleChange}
                         placeholder="Enter new password"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
                     />
                 </div>
 
                 <div className="form-group">
-                    <label htmlFor="role">Role:</label>
+                    <label htmlFor="role" className="block text-gray-700 font-medium mb-1">Role:</label>
                     <input
                         type="text"
                         id="role"
@@ -72,10 +75,11 @@ const AdminProfileSettings = () => {
                         value={adminData.role}
                         onChange={handleChange}
                         disabled
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-500 cursor-not-allowed"
                     />
                 </div>
 
-                <button type="submit" className="save-btn">Save Changes</button>
+                <button type="submit" className="w-full py-2 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 focus:outline-none focus:bg-blue-700">Save Changes</button>
             </form>
         </div>
     );

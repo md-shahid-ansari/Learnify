@@ -42,12 +42,14 @@ const StudentResetPage = () => {
 
       if (response.data.success) {
         setSuccess('Password reset successfully. Redirecting to login page...');
-        setTimeout(() => navigate('/student-login'), 3000); // Redirect to student login after 3 seconds
+        setTimeout(() => navigate('/login-page'), 3000); // Redirect to student login after 3 seconds
       } else {
         setError(response.data.message || 'Failed to reset password.');
+        setTimeout(() => navigate('/register-page'), 3000);
       }
     } catch (err) {
       setError('An error occurred. Please try again.');
+      setTimeout(() => navigate('/register-page'), 3000);
     } finally {
       setLoading(false); // Set loading state to false after API call
     }
