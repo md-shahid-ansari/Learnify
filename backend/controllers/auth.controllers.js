@@ -249,7 +249,6 @@ export const authStudent = async (req, res) => {
 
 
 
-
 //tutor
 
 export const tutorRegister = async (req, res) => {
@@ -634,6 +633,40 @@ export const adminForgot = async (req, res) => {
 
     } catch (error) {
         console.log("Error in forgot password:", error);
+        res.status(400).json({ success: false, message: error.message });
+    }
+};
+
+
+export const adminReset = async (req, res) => {
+    try {
+        const { token } = req.params;
+        const { password } = req.body;
+
+        const admin = await Admin.findOne({
+            resetPasswordToken: token,
+            resetPasswordExpireAt: { $gt: Date.now() }
+        });
+
+        if (!admin) {
+            return res.status(400).json({ success: false, message: "Invalid token or expired" });
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+        admin.password = hashedPassword;
+        admin.resetPasswordToken = undefined;
+        admin.resetPasswordExpireAt = undefined;
+        await admin.save();
+
+        await sendResetSuccessEmail(admin.email);
+
+        res.status(200).json({
+            success: true,
+            message: "Password changed successfully",
+        });
+
+    } catch (error) {
+        console.log("Error in admin reset password:", error);
         res.status(400).json({ success: false, message: error.message });
     }
 };

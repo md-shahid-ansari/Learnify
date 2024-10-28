@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import './LoginPage.css'; // Import the CSS file
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
@@ -84,20 +83,12 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="login-container">
-      <div className="bubble-background">
-        <div className="bubble bubble1"></div>
-        <div className="bubble bubble2"></div>
-        <div className="bubble bubble3"></div>
-        <div className="bubble bubble4"></div>
-        <div className="bubble bubble5"></div>
-      </div>
-
-      <div className="login-box">
-        <h2>Login to Your Account</h2>
-        <form onSubmit={handleSubmit} className="login-form">
+    <div className="flex justify-center items-center min-h-screen bg-gray-200">
+      <div className="bg-gray-300 shadow-md rounded-lg p-6 max-w-md w-full">
+        <h2 className="text-2xl font-bold mb-4 text-gray-800 text-center">Login to Your Account</h2>
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div className="form-group">
-            <label>Email Address</label>
+            <label className="block text-sm font-medium text-gray-700">Email Address</label>
             <input
               type="email"
               placeholder="Enter your email"
@@ -105,10 +96,11 @@ const LoginPage = () => {
               value={formData.email}
               onChange={handleChange}
               required
+              className="mt-1 block w-full border border-gray-400 rounded-lg p-2 bg-white text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           <div className="form-group">
-            <label>Password</label>
+            <label className="block text-sm font-medium text-gray-700">Password</label>
             <input
               type="password"
               placeholder="Enter your password"
@@ -116,30 +108,23 @@ const LoginPage = () => {
               value={formData.password}
               onChange={handleChange}
               required
+              className="mt-1 block w-full border border-gray-400 rounded-lg p-2 bg-white text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
-          <div className="form-group">
-            <label>I am a:</label>
-            <select name="role" value={formData.role} onChange={handleChange}>
-              <option value="Student">Student</option>
-              <option value="Mentor">Mentor</option>
-              <option value="Company">Company</option>
-            </select>
-          </div>
-          <button type="submit" className="login-button" disabled={loadingLogin}>
+          <button type="submit" className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 rounded" disabled={loadingLogin}>
             {loadingLogin ? 'Logging in...' : 'Login'}
           </button>
           <button
             type="button"
-            className="forgot-password"
+            className="w-full text-blue-500 hover:underline"
             disabled={loadingForgot}
             onClick={handleForgot}
           >
             {loadingForgot ? 'Sending reset link...' : 'Forgot Password?'}
           </button>
-          {error && <div className="error-message">{error}</div>}
-          <p>
-            <Link to={`/register-page`}>
+          {error && <div className="text-red-500 text-sm">{error}</div>}
+          <p className="text-center">
+            <Link to={`/register-page`} className="text-blue-500 hover:underline">
               Not registered? Click here to register!
             </Link>
           </p>

@@ -1,22 +1,24 @@
-import React from 'react';
-import {Link} from 'react-router-dom';
-import './Header.css';
+// src/components/Header.js
+import React from "react";
+import { Link } from "react-router-dom";
 
-const Header = () => {
+function Header() {
   return (
-    <header>
-        <nav className="navbar">
-            <div className="logo">Academix</div>
-            <ul className="nav-links">
-                <li className="search-container">
-                <i className="fas fa-search search-icon"></i>
-                <input type="text" className="search-input" placeholder="Search..." />
-                </li>
-                <li><Link to="/login-page">Login/Register</Link></li>
-            </ul>
-        </nav>
+    <header className="flex justify-between items-center p-4 bg-gray-800 text-white">
+      <div className="text-2xl font-bold">Learnify</div>
+      <input
+        type="text"
+        placeholder="Search courses..."
+        className="border border-gray-300 rounded-lg p-2 bg-white text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 max-w-xs flex-grow"
+      />
+      <Link
+        to="/login-page"
+        className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded"
+      >
+        Register/Login
+      </Link>
     </header>
   );
-};
+}
 
 export default Header;

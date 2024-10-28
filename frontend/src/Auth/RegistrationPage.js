@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import './RegistrationPage.css'; // Import the CSS file
-import {useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';  // Import axios
 
 const URL = process.env.REACT_APP_BACKEND_URL;
@@ -14,7 +13,7 @@ const RegistrationPage = () => {
     role: '',
     skills: '',
     bio: '',
-    profilePicture: null,
+    contactNumber: '', // Contact number for Admin
     otp: '',
   });
   
@@ -25,10 +24,10 @@ const RegistrationPage = () => {
   const [selectRole, setSelectRole] = useState('');
 
   const handleChange = (e) => {
-    const { name, value, type, files } = e.target;
+    const { name, value } = e.target;
     setFormData({
       ...formData,
-      [name]: type === 'file' ? files[0] : value
+      [name]: value
     });
   };
 
@@ -44,7 +43,7 @@ const RegistrationPage = () => {
       return;
     }
 
-    const { role, name, email, password, skills, bio } = formData;
+    const { role, name, email, password, skills, bio, contactNumber } = formData;
 
     try {
       const response = await axios.post(`${URL}/api/auth/${role.toLowerCase()}-register`, {
@@ -52,7 +51,8 @@ const RegistrationPage = () => {
         email,
         password,
         skills: role === 'Student' ? skills : undefined,
-        bio: role === 'Mentor' ? bio : undefined,
+        bio: role === 'Tutor' ? bio : undefined,
+        contactNumber: role === 'Admin' ? contactNumber : undefined, // Add contact number for Admin
       });
 
       if (response.data.success) {
@@ -110,28 +110,22 @@ const RegistrationPage = () => {
   };
 
   return (
-    <div className="registration-container">
+    <div className="flex h-screen">
       {/* design */}
-      <div className="left-side">
-        <div className="bubble-background">
-          <div className="bubble bubble1"></div>
-          <div className="bubble bubble2"></div>
-          <div className="bubble bubble3"></div>
-          <div className="bubble bubble4"></div>
-          <div className="bubble bubble5"></div>
-        </div>
-        <div className="welcome-text">
-          <h2>Create an Account</h2>
-          <p>Join the platform to bridge the gap between academia and industry.</p>
+      <div className="hidden lg:flex lg:w-1/2 bg-gray-100 justify-center items-center">
+        <div className="text-center">
+          <h2 className="text-3xl font-bold">Welcome to Learnify</h2>
+          <p className="mt-2 text-lg">Join the platform to bridge the gap between academia and industry.</p>
         </div>
       </div>
 
       {/* design */}
-      <div className="right-side">
-        {!isOtpSent ? (
-          <form className="registration-form" onSubmit={handleSubmit}>
+      <div className="w-full lg:w-1/2 flex justify-center items-center bg-white p-6">
+        <div className="w-full max-w-md">
+          <h2 className="text-2xl font-semibold text-center">Create an Account</h2>
+          <form className="mt-4 space-y-4" onSubmit={handleSubmit}>
             <div className="form-group">
-              <label>Full Name</label>
+              <label className="block text-sm font-medium">Full Name</label>
               <input
                 type="text"
                 name="name"
@@ -139,10 +133,11 @@ const RegistrationPage = () => {
                 value={formData.name}
                 onChange={handleChange}
                 required
+                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-indigo-200"
               />
             </div>
             <div className="form-group">
-              <label>Email Address</label>
+              <label className="block text-sm font-medium">Email Address</label>
               <input
                 type="email"
                 name="email"
@@ -150,10 +145,11 @@ const RegistrationPage = () => {
                 value={formData.email}
                 onChange={handleChange}
                 required
+                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-indigo-200"
               />
             </div>
             <div className="form-group">
-              <label>Password</label>
+              <label className="block text-sm font-medium">Password</label>
               <input
                 type="password"
                 name="password"
@@ -161,10 +157,11 @@ const RegistrationPage = () => {
                 value={formData.password}
                 onChange={handleChange}
                 required
+                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-indigo-200"
               />
             </div>
             <div className="form-group">
-              <label>Confirm Password</label>
+              <label className="block text-sm font-medium">Confirm Password</label>
               <input
                 type="password"
                 name="confirmPassword"
@@ -172,76 +169,87 @@ const RegistrationPage = () => {
                 value={formData.confirmPassword}
                 onChange={handleChange}
                 required
+                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-indigo-200"
               />
             </div>
             <div className="form-group">
-              <label>I am a:</label>
-              <select name="role" value={formData.role} onChange={handleChange} required>
+              <label className="block text-sm font-medium">I am a:</label>
+              <select name="role" value={formData.role} onChange={handleChange} required className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-indigo-200">
                 <option value="">Select Role</option>
                 <option value="Student">Student</option>
-                <option value="Mentor">Mentor</option>
-                <option value="Company">Company</option>
+                <option value="Tutor">Tutor</option>
+                <option value="Admin">Admin</option>
               </select>
             </div>
             {formData.role === 'Student' && (
               <div className="form-group">
-                <label>Skills (for students)</label>
+                <label className="block text-sm font-medium">Skills (for students)</label>
                 <input
                   type="text"
                   name="skills"
                   placeholder="List your skills (comma-separated)"
                   value={formData.skills}
                   onChange={handleChange}
+                  className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-indigo-200"
                 />
               </div>
             )}
-            {formData.role === 'Mentor' && (
+            {formData.role === 'Tutor' && (
               <div className="form-group">
-                <label>Short Bio (for mentors)</label>
+                <label className="block text-sm font-medium">Short Bio (for mentors)</label>
                 <textarea
                   name="bio"
                   placeholder="Tell us about yourself"
                   value={formData.bio}
                   onChange={handleChange}
+                  className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-indigo-200"
                 ></textarea>
               </div>
             )}
-            <div className="form-group">
-              <label>Upload Profile Picture</label>
-              <input
-                type="file"
-                name="profilePicture"
-                onChange={handleChange}
-              />
-            </div>
-            {error && <div className="error-message">{error}</div>}
-            <button type="submit" className="submit-button" disabled={loading}>
+            {formData.role === 'Admin' && (
+              <div className="form-group">
+                <label className="block text-sm font-medium">Contact Number</label>
+                <input
+                  type="text"
+                  name="contactNumber"
+                  placeholder="Enter your contact number"
+                  value={formData.contactNumber}
+                  onChange={handleChange}
+                  required
+                  className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-indigo-200"
+                />
+              </div>
+            )}
+            {error && <div className="text-red-600 text-sm">{error}</div>}
+            <button type="submit" className="w-full bg-indigo-600 text-white py-2 rounded-md hover:bg-indigo-700 transition duration-200" disabled={loading}>
               {loading ? "Registering..." : "Sign Up"}
             </button>
-            <p>
-              <Link to={`/login-page`}>
+            <p className="text-center">
+              <Link to={`/login-page`} className="text-indigo-600 hover:underline">
                 Already registered? Click here to login!
               </Link>
             </p>
           </form>
-        ) : (
-          <form onSubmit={handleOtpSubmit} className="verification-form">
-            <div className="form-group">
-              <label>Enter the 6-digit OTP:</label>
-              <input
-                type="text"
-                name="otp"
-                value={formData.otp}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            {error && <div className="error-message">{error}</div>}
-            <button type="submit" className="submit-button" disabled={loading}>
-              {loading ? "Verifying..." : "Verify"}
-            </button>
-          </form>
-        )}
+          {isOtpSent && (
+            <form onSubmit={handleOtpSubmit} className="mt-6">
+              <div className="form-group">
+                <label className="block text-sm font-medium">Enter OTP</label>
+                <input
+                  type="text"
+                  name="otp"
+                  placeholder="Enter the OTP sent to your email"
+                  value={formData.otp}
+                  onChange={handleChange}
+                  required
+                  className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-indigo-200"
+                />
+              </div>
+              <button type="submit" className="w-full bg-indigo-600 text-white py-2 rounded-md hover:bg-indigo-700 transition duration-200" disabled={loading}>
+                {loading ? "Verifying..." : "Verify OTP"}
+              </button>
+            </form>
+          )}
+        </div>
       </div>
     </div>
   );
