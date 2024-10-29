@@ -46,10 +46,6 @@ const tutorSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Course'  // Reference to the Course schema
     }],
-    learningPaths: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'LearningPath'  // Reference to the Learning Path schema
-    }],
     dateJoined: {
         type: Date,
         default: Date.now

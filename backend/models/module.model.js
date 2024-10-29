@@ -16,18 +16,14 @@ const moduleSchema = new mongoose.Schema({
         type: String,
         required: true  // Overview of the module’s content and learning objectives
     },
-    mentor: {
+    tutor: {
         type: mongoose.Schema.Types.ObjectId,  // Reference to the mentor (User)
-        ref: 'Mentor',
+        ref: 'Tutor',
         required: true
     },
-    skillsEarned: {
-        type: [String],  // List of skills students will gain after completing the module
-        default: []
-    },
-    topics: [{
+    lessons: [{
         type: mongoose.Schema.Types.ObjectId,  // Reference to Topic model
-        ref: 'Topic'
+        ref: 'Lesson'
     }],
     quizzes: [{
         type: mongoose.Schema.Types.ObjectId,  // Reference to Quiz model

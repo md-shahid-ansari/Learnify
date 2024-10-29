@@ -16,15 +16,23 @@ const courseSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    instructor: [{
+    tutor: [{
         type: mongoose.Schema.Types.ObjectId,  // Reference to the mentor (or instructor)
-        ref: 'User',
+        ref: 'Tutor',
         required: true
     }],
     modules: [{
         type: mongoose.Schema.Types.ObjectId,  // Reference to Module model
         ref: 'Module'
-    }]
+    }],
+    certifications: [{
+        type: mongoose.Schema.Types.ObjectId,  // References to Certification model
+        ref: 'Certification'
+    }],
+    dateCreated: {
+        type: Date,
+        default: Date.now
+    }
 }, { timestamps: true });
 
 // Apply auto-increment plugin to Course schema

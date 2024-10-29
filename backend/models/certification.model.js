@@ -16,18 +16,18 @@ const certificationSchema = new mongoose.Schema({
         type: String,
         required: true  // Overview of the certification
     },
-    issuingOrganization: {
-        type: String,
-        required: true  // The organization endorsing the certification
+    course: {
+        type: mongoose.Schema.Types.ObjectId,  
+        ref: 'Course'
     },
-    requirements: {
-        type: String,  // Requirements for earning the certification
-        required: true
+    tutor: {
+        type: mongoose.Schema.Types.ObjectId,  
+        ref: 'Tutor'
     },
-    earnedBy: {
-        type: [Number],  // List of student IDs who have earned the certification
-        default: []
-    },
+    earnedBy: [{
+        type: mongoose.Schema.Types.ObjectId,  // List of student IDs who have earned the certification
+        ref: 'Student'
+    }],
     dateEarned: {
         type: Date,  // Date when the certification was awarded
         default: null

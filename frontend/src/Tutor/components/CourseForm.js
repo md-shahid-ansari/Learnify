@@ -24,7 +24,7 @@ const CourseForm = ({ course, onCourseChange }) => {
     };
 
     return (
-        <div className="p-4 border border-gray-300 rounded-lg mb-6 bg-white shadow-md">
+        <div className="mb-4">
             <h3 className="text-lg font-semibold mb-4">Course Details</h3>
             
             {/* Course Title Input */}

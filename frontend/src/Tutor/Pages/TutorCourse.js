@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import CourseForm from '../components/CourseForm'; // Course component to handle the course-level actions
 
 const TutorCourse = () => {
-    const [course, setCourse] = useState({ title: '', description: '', modules: [] });
+    const [course, setCourse] = useState({ title: '', description: '', modules: [], certificate: null });
     const [isCourseCreated, setIsCourseCreated] = useState(false);
+    const [certificate, setCertificate] = useState({ title: '', description: '' });
+    const [isCertificateFieldVisible, setIsCertificateFieldVisible] = useState(false);
 
     const handleAddCourse = () => {
         setIsCourseCreated(true); // Set to true when creating a course
@@ -11,6 +13,28 @@ const TutorCourse = () => {
 
     const onCourseChange = (updatedCourse) => {
         setCourse(updatedCourse);
+    };
+
+    const handleCertificateChange = (e) => {
+        const { name, value } = e.target;
+        const updatedCertificate = {
+            ...certificate,
+            [name]: value
+        };
+        setCertificate(updatedCertificate);
+        setCourse((prevCourse) => ({
+            ...prevCourse,
+            certificate: updatedCertificate
+        }));
+    };
+
+    const toggleCertificateField = () => {
+        setIsCertificateFieldVisible((prevVisible) => !prevVisible);
+        if (isCertificateFieldVisible) {
+            // Reset certificate when hiding the fields
+            setCertificate({ title: '', description: '' });
+            setCourse((prevCourse) => ({ ...prevCourse, certificate: null }));
+        }
     };
 
     const handleSubmit = () => {
@@ -26,7 +50,9 @@ const TutorCourse = () => {
 
     const handleCancel = () => {
         setIsCourseCreated(false); // Hide form and submit button
-        setCourse({ title: '', description: '', modules: [] }); // Reset the course state
+        setCourse({ title: '', description: '', modules: [], certificate: null }); // Reset the course state
+        setCertificate({ title: '', description: '' });
+        setIsCertificateFieldVisible(false);
     };
 
     return (
@@ -44,13 +70,49 @@ const TutorCourse = () => {
                 )}
             </div>
 
-            {/* Course Form */}
+            
             {isCourseCreated && (
-                <div className="mb-4">
+                <div className="p-4 border border-gray-300 rounded-lg mb-6 bg-white shadow-md">
+                    {/* Course Form */}
                     <CourseForm 
                         course={course} 
                         onCourseChange={onCourseChange} 
                     />
+
+                    {/* Certificate Section */}
+                    <h3 className="text-lg font-semibold mb-2">Certificate</h3>
+                    {!isCertificateFieldVisible ? (
+                        <button
+                            onClick={toggleCertificateField}
+                            className="bg-blue-500 text-white px-3 py-1 rounded"
+                        >
+                            Add Certificate
+                        </button>
+                    ) : (
+                        <div>
+                            <input
+                                type="text"
+                                name="title"
+                                value={certificate.title}
+                                onChange={handleCertificateChange}
+                                placeholder="Certificate Title"
+                                className="mb-2 px-3 py-1 border rounded w-full"
+                            />
+                            <textarea
+                                name="description"
+                                value={certificate.description}
+                                onChange={handleCertificateChange}
+                                placeholder="Certificate Description"
+                                className="mb-2 px-3 py-1 border rounded w-full"
+                            />
+                            <button
+                                onClick={toggleCertificateField}
+                                className="bg-red-500 text-white px-3 py-1 rounded"
+                            >
+                                Remove Certificate
+                            </button>
+                        </div>
+                    )}
                 </div>
             )}
 

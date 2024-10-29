@@ -38,17 +38,17 @@ const StudentSidebar = () => {
       <nav>
         <ul className="space-y-4">
           <li>
-            <Link to="student-dashboard" className="text-lg hover:text-blue-400">
+            <Link to="student-dashboard" className="block py-2 px-4 rounded hover:bg-gray-700">
               Dashboard
             </Link>
           </li>
           <li>
-            <Link to="student-course" className="text-lg hover:text-blue-400">
+            <Link to="student-course" className="block py-2 px-4 rounded hover:bg-gray-700">
               Courses
             </Link>
           </li>
           <li>
-            <Link to="student-certificate" className="text-lg hover:text-blue-400">
+            <Link to="student-certificate" className="block py-2 px-4 rounded hover:bg-gray-700">
               Certificates
             </Link>
           </li>
