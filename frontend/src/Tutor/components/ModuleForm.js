@@ -3,11 +3,21 @@ import LessonForm from './LessonForm'; // Lesson Component
 import QuizForm from './QuizForm'; // Import the QuizForm component
 
 const ModuleForm = ({ index, module, onModuleChange, handleRemoveModule }) => {
-    const [moduleData, setModuleData] = useState(module);
+    const [moduleData, setModuleData] = useState({
+        title: module.title || '',
+        description: module.description || '',
+        lessons: module.lessons || [],
+        quizzes: module.quizzes || []
+    });
 
     // Sync the local state with the incoming module prop
     useEffect(() => {
-        setModuleData(module);
+        setModuleData({
+            title: module.title || '',
+            description: module.description || '',
+            lessons: module.lessons || [],
+            quizzes: module.quizzes || []
+        });
     }, [module]);
 
     const handleAddLesson = () => {
@@ -44,6 +54,20 @@ const ModuleForm = ({ index, module, onModuleChange, handleRemoveModule }) => {
         onModuleChange(index, updatedModuleData); // Update parent
     };
 
+    const handleTitleChange = (e) => {
+        const title = e.target.value || ''; // Default to empty string
+        const updatedModuleData = { ...moduleData, title };
+        setModuleData(updatedModuleData);
+        onModuleChange(index, updatedModuleData); // Update parent
+    };
+
+    const handleDescriptionChange = (e) => {
+        const description = e.target.value || ''; // Default to empty string
+        const updatedModuleData = { ...moduleData, description };
+        setModuleData(updatedModuleData);
+        onModuleChange(index, updatedModuleData); // Update parent
+    };
+
     return (
         <div className="mb-6">
             <div className="flex items-center justify-between mb-2">
@@ -58,24 +82,18 @@ const ModuleForm = ({ index, module, onModuleChange, handleRemoveModule }) => {
             </div>
             <input
                 type="text"
-                value={moduleData.title}
-                onChange={(e) => {
-                    const updatedModuleData = { ...moduleData, title: e.target.value };
-                    setModuleData(updatedModuleData);
-                    onModuleChange(index, updatedModuleData); // Update parent
-                }}
+                value={moduleData.title} // Controlled input
+                onChange={handleTitleChange}
                 placeholder="Module Title"
                 className="w-full p-2 mb-2 border border-gray-300 rounded"
+                required
             />
             <textarea
-                value={moduleData.description}
-                onChange={(e) => {
-                    const updatedModuleData = { ...moduleData, description: e.target.value };
-                    setModuleData(updatedModuleData);
-                    onModuleChange(index, updatedModuleData); // Update parent
-                }}
+                value={moduleData.description} // Controlled input
+                onChange={handleDescriptionChange}
                 placeholder="Module Description"
                 className="w-full p-2 mb-4 border border-gray-300 rounded"
+                required
             />
 
             {/* Render Lesson Components */}
@@ -96,7 +114,6 @@ const ModuleForm = ({ index, module, onModuleChange, handleRemoveModule }) => {
                         }}
                         handleRemoveLesson={handleRemoveLesson}
                     />
-                    
                 </div>
             ))}
 
@@ -110,7 +127,7 @@ const ModuleForm = ({ index, module, onModuleChange, handleRemoveModule }) => {
 
             {/* Render Quiz Components */}
             <h2 className="text-lg font-bold mb-4">Quizzes</h2>
-            {moduleData.quizzes?.map((quiz, quizIndex) => (
+            {(moduleData.quizzes || []).map((quiz, quizIndex) => (
                 <div key={quizIndex} className="mb-4">
                     <QuizForm
                         index={quizIndex}

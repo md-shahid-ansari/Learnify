@@ -1,10 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const QuizForm = ({ index, quiz, onQuizChange, handleRemoveQuiz }) => {
-    const [quizData, setQuizData] = useState(quiz || {
-        title: '',
-        questions: []
-    });
+    const [quizData, setQuizData] = useState(() => ({
+        title: quiz.title || '',
+        questions: quiz.questions || []
+    }));
+
+    // Sync the local state with the incoming quiz prop
+    useEffect(() => {
+        setQuizData({
+            title: quiz.title || '',
+            questions: quiz.questions || []
+        });
+    }, [quiz]);
 
     // Update the quiz data and propagate changes to parent
     const updateQuizData = (updatedData) => {
@@ -71,13 +79,14 @@ const QuizForm = ({ index, quiz, onQuizChange, handleRemoveQuiz }) => {
                 >
                     ×
                 </button>
-                </div>
+            </div>
             <input
                 type="text"
-                value={quizData.title}
+                value={quizData.title} // Controlled input
                 onChange={(e) => updateQuizData({ ...quizData, title: e.target.value })}
                 placeholder="Quiz Title"
                 className="w-full p-2 mb-4 border border-gray-300 rounded"
+                required
             />
 
             {/* Render Questions */}
@@ -94,7 +103,7 @@ const QuizForm = ({ index, quiz, onQuizChange, handleRemoveQuiz }) => {
                         </button>
                     </div>
                     <textarea
-                        value={question.questionText}
+                        value={question.questionText} // Controlled input
                         onChange={(e) =>
                             handleQuestionChange(questionIndex, {
                                 ...question,
@@ -103,9 +112,10 @@ const QuizForm = ({ index, quiz, onQuizChange, handleRemoveQuiz }) => {
                         }
                         placeholder="Question Text"
                         className="w-full p-2 mb-2 border border-gray-300 rounded"
+                        required
                     />
                     <select
-                        value={question.questionType}
+                        value={question.questionType} // Controlled input
                         onChange={(e) =>
                             handleQuestionChange(questionIndex, {
                                 ...question,
@@ -125,7 +135,7 @@ const QuizForm = ({ index, quiz, onQuizChange, handleRemoveQuiz }) => {
                             <div key={optionIndex} className="flex items-center justify-between mb-2">
                                 <input
                                     type="text"
-                                    value={option}
+                                    value={option} // Controlled input
                                     onChange={(e) => {
                                         const updatedOptions = question.options.map((opt, i) =>
                                             i === optionIndex ? e.target.value : opt
@@ -137,6 +147,7 @@ const QuizForm = ({ index, quiz, onQuizChange, handleRemoveQuiz }) => {
                                     }}
                                     placeholder={`Option ${optionIndex + 1}`}
                                     className="mr-2 w-full p-2 border border-gray-300 rounded"
+                                    required
                                 />
                                 <button
                                     type="button"
@@ -162,7 +173,7 @@ const QuizForm = ({ index, quiz, onQuizChange, handleRemoveQuiz }) => {
                     {/* Correct Answer */}
                     <input
                         type="text"
-                        value={question.correctAnswer}
+                        value={question.correctAnswer} // Controlled input
                         onChange={(e) =>
                             handleQuestionChange(questionIndex, {
                                 ...question,
@@ -171,6 +182,7 @@ const QuizForm = ({ index, quiz, onQuizChange, handleRemoveQuiz }) => {
                         }
                         placeholder="Correct Answer"
                         className="w-full p-2 mb-2 border border-gray-300 rounded"
+                        required
                     />
                 </div>
             ))}

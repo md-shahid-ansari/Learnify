@@ -1,23 +1,39 @@
 import React, { useState, useEffect } from 'react';
 import TopicForm from './TopicForm'; // Import the TopicForm component
 
-const LessonForm = ({ index, lesson, onLessonChange , handleRemoveLesson}) => {
-    const [lessonData, setLessonData] = useState(lesson);
+const LessonForm = ({ index, lesson, onLessonChange, handleRemoveLesson }) => {
+    const [lessonData, setLessonData] = useState(lesson || { title: '', description: '', topics: [] });
 
     // Sync the local state with the incoming lesson prop
     useEffect(() => {
         setLessonData(lesson);
     }, [lesson]);
 
-    const handleAddTopic = () => {
-        const newTopic = { title: '', content: '', learningOutcomes: [] };
-        const updatedTopics = [...(lessonData.topics || []), newTopic];
-        const updatedLessonData = { ...lessonData, topics: updatedTopics };
-        
+    // Handle changes to the lesson title
+    const handleTitleChange = (e) => {
+        const updatedLessonData = { ...lessonData, title: e.target.value };
         setLessonData(updatedLessonData);
         onLessonChange(index, updatedLessonData); // Update parent
     };
 
+    // Handle changes to the lesson description
+    const handleDescriptionChange = (e) => {
+        const updatedLessonData = { ...lessonData, description: e.target.value };
+        setLessonData(updatedLessonData);
+        onLessonChange(index, updatedLessonData); // Update parent
+    };
+
+    // Handle adding a new topic
+    const handleAddTopic = () => {
+        const newTopic = { title: '', content: '', learningOutcomes: [] };
+        const updatedTopics = [...(lessonData.topics || []), newTopic];
+        const updatedLessonData = { ...lessonData, topics: updatedTopics };
+
+        setLessonData(updatedLessonData);
+        onLessonChange(index, updatedLessonData); // Update parent
+    };
+
+    // Handle removing a topic
     const handleRemoveTopic = (topicIndex) => {
         const updatedTopics = lessonData.topics.filter((_, i) => i !== topicIndex);
         const updatedLessonData = { ...lessonData, topics: updatedTopics };
@@ -27,13 +43,13 @@ const LessonForm = ({ index, lesson, onLessonChange , handleRemoveLesson}) => {
     };
 
     return (
-        <div className="">
+        <div className="mb-6 p-4 border border-gray-300 rounded-md">
             <div className="flex items-center justify-between mb-2">
-                <h4 className="text-l font-semibold mb-3">Lesson {index + 1}</h4>
+                <h4 className="text-lg font-semibold">Lesson {index + 1}</h4>
                 <button
                     type="button"
                     onClick={() => handleRemoveLesson(index)}
-                    className="mt-2 px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600"
+                    className="px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600"
                 >
                     ×
                 </button>
@@ -41,23 +57,15 @@ const LessonForm = ({ index, lesson, onLessonChange , handleRemoveLesson}) => {
             <input
                 type="text"
                 value={lessonData.title}
-                onChange={(e) => {
-                    const updatedLessonData = { ...lessonData, title: e.target.value };
-                    setLessonData(updatedLessonData);
-                    onLessonChange(index, updatedLessonData); // Update parent
-                }}
+                onChange={handleTitleChange}
                 placeholder="Lesson Title"
-                className="w-full mb-2 px-3 py-2 border rounded-md"
+                className="w-full mb-2 p-2 border border-gray-300 rounded-md"
             />
             <textarea
                 value={lessonData.description}
-                onChange={(e) => {
-                    const updatedLessonData = { ...lessonData, description: e.target.value };
-                    setLessonData(updatedLessonData);
-                    onLessonChange(index, updatedLessonData); // Update parent
-                }}
+                onChange={handleDescriptionChange}
                 placeholder="Lesson Description"
-                className="w-full mb-4 px-3 py-2 border rounded-md"
+                className="w-full mb-4 p-2 border border-gray-300 rounded-md"
             />
 
             {/* Render Topic Components */}
@@ -72,7 +80,7 @@ const LessonForm = ({ index, lesson, onLessonChange , handleRemoveLesson}) => {
                                 idx === i ? updatedTopic : t
                             );
                             const updatedLessonData = { ...lessonData, topics: updatedTopics };
-                            
+
                             setLessonData(updatedLessonData);
                             onLessonChange(index, updatedLessonData); // Update parent
                         }}

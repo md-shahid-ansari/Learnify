@@ -1,13 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const TopicForm = ({ index, topic, onTopicChange, handleRemoveTopic }) => {
-    const [topicData, setTopicData] = useState(topic || {
+    const [topicData, setTopicData] = useState({
         title: '',
         content: '',
         learningOutcomes: [],
         images: [],
-        videos: []
+        videos: [],
+        ...topic // Spread existing topic data
     });
+
+    // Sync props with local state
+    useEffect(() => {
+        if (topic) {
+            setTopicData(topic);
+        }
+    }, [topic]);
 
     // Helper to update state and propagate changes
     const updateTopicData = (updatedData) => {
@@ -15,7 +23,6 @@ const TopicForm = ({ index, topic, onTopicChange, handleRemoveTopic }) => {
         onTopicChange(index, updatedData);  // Trigger parent update
     };
 
-    // Handle adding a new outcome
     const handleAddOutcome = () => {
         const updatedData = {
             ...topicData,
@@ -24,7 +31,6 @@ const TopicForm = ({ index, topic, onTopicChange, handleRemoveTopic }) => {
         updateTopicData(updatedData);
     };
 
-    // Handle removing an outcome
     const handleRemoveOutcome = (outcomeIndex) => {
         const updatedOutcomes = (topicData.learningOutcomes || []).filter((_, i) => i !== outcomeIndex);
         updateTopicData({ ...topicData, learningOutcomes: updatedOutcomes });
@@ -37,7 +43,6 @@ const TopicForm = ({ index, topic, onTopicChange, handleRemoveTopic }) => {
         updateTopicData({ ...topicData, learningOutcomes: updatedOutcomes });
     };
 
-    // Handle adding/removing images
     const handleAddImage = () => {
         const newImage = { title: '', file: null };
         updateTopicData({
@@ -58,7 +63,6 @@ const TopicForm = ({ index, topic, onTopicChange, handleRemoveTopic }) => {
         updateTopicData({ ...topicData, images: updatedImages });
     };
 
-    // Handle adding/removing videos
     const handleAddVideo = () => {
         const newVideo = { title: '', url: '' };
         updateTopicData({
@@ -80,15 +84,16 @@ const TopicForm = ({ index, topic, onTopicChange, handleRemoveTopic }) => {
     };
 
     return (
-        <div className="">
+        <div className="border p-4 rounded-lg shadow-md">
             <div className="flex items-center justify-between mb-2">
-                <h5 className="text-l font-semibold">Topic {index + 1}</h5>
+                <h5 className="text-lg font-semibold">Topic {index + 1}</h5>
                 <button
                     type="button"
                     onClick={() => handleRemoveTopic(index)}
                     className="mt-2 px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600"
+                    aria-label="Remove Topic"
                 >
-                   ×
+                    ×
                 </button>
             </div>
 
@@ -99,6 +104,7 @@ const TopicForm = ({ index, topic, onTopicChange, handleRemoveTopic }) => {
                 onChange={(e) => updateTopicData({ ...topicData, title: e.target.value })}
                 placeholder="Topic Title"
                 className="mt-2 mb-4 w-full p-2 border border-gray-300 rounded"
+                required
             />
 
             {/* Topic Content */}
@@ -107,6 +113,7 @@ const TopicForm = ({ index, topic, onTopicChange, handleRemoveTopic }) => {
                 onChange={(e) => updateTopicData({ ...topicData, content: e.target.value })}
                 placeholder="Topic Content"
                 className="mt-2 mb-4 w-full p-2 border border-gray-300 rounded"
+                required
             />
 
             {/* Learning Outcomes */}
@@ -125,6 +132,7 @@ const TopicForm = ({ index, topic, onTopicChange, handleRemoveTopic }) => {
                             type="button"
                             onClick={() => handleRemoveOutcome(outcomeIndex)}
                             className="mt-2 px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600"
+                            aria-label={`Remove Outcome ${outcomeIndex + 1}`}
                         >
                             ×
                         </button>
@@ -139,7 +147,7 @@ const TopicForm = ({ index, topic, onTopicChange, handleRemoveTopic }) => {
                 </button>
             </div>
 
-            {/* Add Images */}
+            {/* Images Section */}
             <div className="mb-4">
                 <h6 className="text-md font-semibold">Images</h6>
                 {(topicData.images || []).map((image, imageIndex) => (
@@ -161,6 +169,7 @@ const TopicForm = ({ index, topic, onTopicChange, handleRemoveTopic }) => {
                             type="button"
                             onClick={() => handleRemoveImage(imageIndex)}
                             className="mt-2 px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600"
+                            aria-label={`Remove Image ${imageIndex + 1}`}
                         >
                             ×
                         </button>
@@ -175,7 +184,7 @@ const TopicForm = ({ index, topic, onTopicChange, handleRemoveTopic }) => {
                 </button>
             </div>
 
-            {/* Add Videos */}
+            {/* Videos Section */}
             <div>
                 <h6 className="text-md font-semibold">Videos</h6>
                 {(topicData.videos || []).map((video, videoIndex) => (
@@ -198,6 +207,7 @@ const TopicForm = ({ index, topic, onTopicChange, handleRemoveTopic }) => {
                             type="button"
                             onClick={() => handleRemoveVideo(videoIndex)}
                             className="mt-2 px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600"
+                            aria-label={`Remove Video ${videoIndex + 1}`}
                         >
                             ×
                         </button>
