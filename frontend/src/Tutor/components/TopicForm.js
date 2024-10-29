@@ -84,7 +84,7 @@ const TopicForm = ({ index, topic, onTopicChange, handleRemoveTopic }) => {
     };
 
     return (
-        <div className="border p-4 rounded-lg shadow-md">
+        <div className="mb-4">
             <div className="flex items-center justify-between mb-2">
                 <h5 className="text-lg font-semibold">Topic {index + 1}</h5>
                 <button

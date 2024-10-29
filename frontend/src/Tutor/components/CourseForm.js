@@ -1,25 +1,47 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ModuleForm from './ModuleForm';  // Import the ModuleForm component
 
 const CourseForm = ({ course, onCourseChange }) => {
-    const [courseData, setCourseData] = useState(course);
+    const [courseData, setCourseData] = useState({
+        title: course.title || '',
+        description: course.description || '',
+        modules: course.modules || []
+    });
 
-    // Helper function to handle changes to title, description, and modules
+    // Sync local state with the incoming course prop
+    useEffect(() => {
+        setCourseData({
+            title: course.title || '',
+            description: course.description || '',
+            modules: course.modules || []
+        });
+    }, [course]);
+
+    // Helper function to handle title, description, and modules changes
     const handleInputChange = (field, value) => {
         const updatedCourseData = { ...courseData, [field]: value };
         setCourseData(updatedCourseData);
-        onCourseChange(updatedCourseData); // Update course state in TutorCourse
+        onCourseChange(updatedCourseData); // Update course state in parent component
     };
 
     // Add a new module
     const handleAddModule = () => {
-        const newModule = { title: '', description: '', topics: [], quizzes: [] };
-        handleInputChange("modules", [...courseData.modules, newModule]);
+        const newModule = { title: '', description: '', lessons: [], quizzes: [] };
+        const updatedModules = [...courseData.modules, newModule];
+        handleInputChange("modules", updatedModules);
     };
 
     // Remove a module by index
     const handleRemoveModule = (moduleIndex) => {
         const updatedModules = courseData.modules.filter((_, i) => i !== moduleIndex);
+        handleInputChange("modules", updatedModules);
+    };
+
+    // Update a specific module by index
+    const handleModuleChange = (moduleIndex, updatedModule) => {
+        const updatedModules = courseData.modules.map((mod, i) =>
+            i === moduleIndex ? updatedModule : mod
+        );
         handleInputChange("modules", updatedModules);
     };
 
@@ -51,12 +73,7 @@ const CourseForm = ({ course, onCourseChange }) => {
                     <ModuleForm
                         index={moduleIndex}
                         module={module}
-                        onModuleChange={(updatedModule) => {
-                            const updatedModules = courseData.modules.map((m, i) =>
-                                i === moduleIndex ? updatedModule : m
-                            );
-                            handleInputChange("modules", updatedModules);
-                        }}
+                        onModuleChange={(idx, updatedModule) => handleModuleChange(moduleIndex, updatedModule)}
                         handleRemoveModule={handleRemoveModule}
                     />
                 </div>

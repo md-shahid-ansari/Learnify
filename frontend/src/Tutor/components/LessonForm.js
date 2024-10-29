@@ -43,7 +43,7 @@ const LessonForm = ({ index, lesson, onLessonChange, handleRemoveLesson }) => {
     };
 
     return (
-        <div className="mb-6 p-4 border border-gray-300 rounded-md">
+        <div className="mb-6">
             <div className="flex items-center justify-between mb-2">
                 <h4 className="text-lg font-semibold">Lesson {index + 1}</h4>
                 <button
