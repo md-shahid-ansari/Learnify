@@ -1,11 +1,31 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import CourseForm from '../components/CourseForm'; // Course component to handle the course-level actions
+import { IsTutorSessionLive } from '../utils/IsTutorSessionLive';
+import { useNavigate } from 'react-router-dom';
 
 const TutorCourse = () => {
     const [course, setCourse] = useState({ title: '', description: '', modules: [], certificate: null });
     const [isCourseCreated, setIsCourseCreated] = useState(false);
     const [certificate, setCertificate] = useState({ title: '', description: '' });
     const [isCertificateFieldVisible, setIsCertificateFieldVisible] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const authenticate= async () => {
+            const { isAuthenticated } = await IsTutorSessionLive();
+      
+            if (!isAuthenticated) {
+              setError('You are not authenticated. Please log in again.');
+              navigate('/login-page');
+              setLoading(false);
+              return;
+            }
+            setLoading(false);
+        };
+        authenticate();
+    });
 
     const handleAddCourse = () => {
         setIsCourseCreated(true); // Set to true when creating a course
@@ -37,9 +57,35 @@ const TutorCourse = () => {
         }
     };
 
+
+
+    const isObject = (value) => value && typeof value === "object" && !Array.isArray(value);
+
+    const findEmptyFields = (obj, path = "") => {
+        let emptyFields = [];
+
+        for (let key in obj) {
+            const currentPath = path ? `${path}.${key}` : key;
+
+            if (obj[key] === null || obj[key] === undefined || obj[key] === "") {
+                emptyFields.push(currentPath); // add path to empty field
+            } else if (isObject(obj[key]) || Array.isArray(obj[key])) {
+                emptyFields = emptyFields.concat(findEmptyFields(obj[key], currentPath));
+            }
+        }
+
+        return emptyFields;
+    };
+
     const handleSubmit = () => {
         if (!course.title || !course.description) {
             alert("Please provide course title and description.");
+            return;
+        }
+
+        const emptyFields = findEmptyFields(course);
+        if (emptyFields.length > 0) {
+            alert(`Please fill out the following fields:\n- ${emptyFields.join("\n- ")}`);
             return;
         }
 
@@ -48,12 +94,30 @@ const TutorCourse = () => {
         // You can also make a POST request to a server here with the course data.
     };
 
+
+
     const handleCancel = () => {
         setIsCourseCreated(false); // Hide form and submit button
         setCourse({ title: '', description: '', modules: [], certificate: null }); // Reset the course state
         setCertificate({ title: '', description: '' });
         setIsCertificateFieldVisible(false);
     };
+
+    // Return loading spinner or error message as needed
+    if (loading) 
+        return (
+        <p className="text-center text-blue-500 text-xl font-semibold animate-pulse mt-10">
+            Loading...
+        </p>
+        );
+
+    if (error) 
+        return (
+        <p className="text-center text-red-500 text-lg font-medium bg-red-100 p-4 rounded mt-10">
+            {error}
+        </p>
+        );
+
 
     return (
         <div className="p-4">
