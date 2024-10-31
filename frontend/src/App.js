@@ -1,5 +1,8 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 import LandingPage from './HomePage/LandingPage';
 import StudentHome from './Student/StudentHome';
 import TutorHome from './Tutor/TutorHome';
@@ -34,6 +37,7 @@ const App = () => {
   return (
     <Router>
       <div className="min-w-[600px] mx-auto">
+        <ToastContainer />
         <Routes>
           <Route path="/" element={<LandingPage />} >
             {/* Default path for Outlet */}

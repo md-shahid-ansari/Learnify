@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import CourseForm from '../components/CourseForm'; // Course component to handle the course-level actions
 import { IsTutorSessionLive } from '../utils/IsTutorSessionLive';
 import { useNavigate } from 'react-router-dom';
+import { showSuccessToast, showErrorToast} from '../../Toast/toasts';
+
 
 const TutorCourse = () => {
     const [course, setCourse] = useState({ title: '', description: '', modules: [], certificate: null });
@@ -9,7 +11,6 @@ const TutorCourse = () => {
     const [certificate, setCertificate] = useState({ title: '', description: '' });
     const [isCertificateFieldVisible, setIsCertificateFieldVisible] = useState(false);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -17,7 +18,7 @@ const TutorCourse = () => {
             const { isAuthenticated } = await IsTutorSessionLive();
       
             if (!isAuthenticated) {
-              setError('You are not authenticated. Please log in again.');
+              showErrorToast('You are not authenticated. Please log in again.');
               navigate('/login-page');
               setLoading(false);
               return;
@@ -58,8 +59,7 @@ const TutorCourse = () => {
     };
 
 
-
-    const isObject = (value) => value && typeof value === "object" && !Array.isArray(value);
+    const isObject = (value) => value && typeof value === "object" && !Array.isArray(value) && !(value instanceof File);
 
     const findEmptyFields = (obj, path = "") => {
         let emptyFields = [];
@@ -67,8 +67,17 @@ const TutorCourse = () => {
         for (let key in obj) {
             const currentPath = path ? `${path}.${key}` : key;
 
+            // Skip fields that are `File` objects without specific validation
+            if (obj[key] instanceof File) {
+                if (obj[key].size === 0) {
+                    emptyFields.push(currentPath); // Add to emptyFields if file is empty
+                }
+                continue;
+            }
+
+            // Check for null, undefined, or empty string values
             if (obj[key] === null || obj[key] === undefined || obj[key] === "") {
-                emptyFields.push(currentPath); // add path to empty field
+                emptyFields.push(currentPath);
             } else if (isObject(obj[key]) || Array.isArray(obj[key])) {
                 emptyFields = emptyFields.concat(findEmptyFields(obj[key], currentPath));
             }
@@ -78,21 +87,23 @@ const TutorCourse = () => {
     };
 
     const handleSubmit = () => {
-        if (!course.title || !course.description) {
-            alert("Please provide course title and description.");
+        if (!course.title || !course.description) { 
+            showErrorToast("Please provide course title and description.");
             return;
         }
 
         const emptyFields = findEmptyFields(course);
         if (emptyFields.length > 0) {
-            alert(`Please fill out the following fields:\n- ${emptyFields.join("\n- ")}`);
+            showErrorToast(`Please fill out the following fields:\n- ${emptyFields.join("\n- ")}`);
             return;
         }
 
         console.log("Course submitted:", course);
-        alert("Course submitted successfully!");
+        showSuccessToast("Course submitted successfully!");
         // You can also make a POST request to a server here with the course data.
     };
+
+
 
 
 
@@ -110,14 +121,6 @@ const TutorCourse = () => {
             Loading...
         </p>
         );
-
-    if (error) 
-        return (
-        <p className="text-center text-red-500 text-lg font-medium bg-red-100 p-4 rounded mt-10">
-            {error}
-        </p>
-        );
-
 
     return (
         <div className="p-4">

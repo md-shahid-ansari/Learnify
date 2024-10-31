@@ -6,7 +6,7 @@ const TopicForm = ({ index, topic, onTopicChange, handleRemoveTopic }) => {
         content: '',
         learningOutcomes: [],
         images: [],
-        videos: [],
+        links: [],
         ...topic // Spread existing topic data
     });
 
@@ -56,31 +56,44 @@ const TopicForm = ({ index, topic, onTopicChange, handleRemoveTopic }) => {
         updateTopicData({ ...topicData, images: updatedImages });
     };
 
-    const handleImageChange = (imageIndex, field, value) => {
-        const updatedImages = (topicData.images || []).map((img, i) =>
-            i === imageIndex ? { ...img, [field]: value } : img
-        );
-        updateTopicData({ ...topicData, images: updatedImages });
-    };
-
-    const handleAddVideo = () => {
-        const newVideo = { title: '', url: '' };
-        updateTopicData({
-            ...topicData,
-            videos: [...(topicData.videos || []), newVideo]
+    
+    // Function to handle image changes
+    const handleImageChange = (index, field, value) => {
+        setTopicData((prevTopicData) => {
+            const updatedImages = [...prevTopicData.images];
+            updatedImages[index] = {
+                ...updatedImages[index],
+                [field]: field === 'file' ? value : value,
+                previewUrl: field === 'file' ? URL.createObjectURL(value) : updatedImages[index].previewUrl
+            };
+            return { ...prevTopicData, images: updatedImages };
         });
     };
 
-    const handleRemoveVideo = (videoIndex) => {
-        const updatedVideos = (topicData.videos || []).filter((_, i) => i !== videoIndex);
-        updateTopicData({ ...topicData, videos: updatedVideos });
+    // Function to trigger file input click
+    const handleImageClick = (index) => {
+        document.getElementById(`file-input-${index}`).click();
     };
 
-    const handleVideoChange = (videoIndex, field, value) => {
-        const updatedVideos = (topicData.videos || []).map((video, i) =>
-            i === videoIndex ? { ...video, [field]: value } : video
+
+    const handleAddlink = () => {
+        const newlink = { title: '', url: '' };
+        updateTopicData({
+            ...topicData,
+            links: [...(topicData.links || []), newlink]
+        });
+    };
+
+    const handleRemovelink = (linkIndex) => {
+        const updatedlinks = (topicData.links || []).filter((_, i) => i !== linkIndex);
+        updateTopicData({ ...topicData, links: updatedlinks });
+    };
+
+    const handlelinkChange = (linkIndex, field, value) => {
+        const updatedlinks = (topicData.links || []).map((link, i) =>
+            i === linkIndex ? { ...link, [field]: value } : link
         );
-        updateTopicData({ ...topicData, videos: updatedVideos });
+        updateTopicData({ ...topicData, links: updatedlinks });
     };
 
     return (
@@ -151,28 +164,45 @@ const TopicForm = ({ index, topic, onTopicChange, handleRemoveTopic }) => {
             <div className="mb-4">
                 <h6 className="text-md font-semibold">Images</h6>
                 {(topicData.images || []).map((image, imageIndex) => (
-                    <div key={imageIndex} className="flex items-center mb-2">
-                        <input
-                            type="text"
-                            value={image.title}
-                            onChange={(e) => handleImageChange(imageIndex, 'title', e.target.value)}
-                            placeholder={`Image Title ${imageIndex + 1}`}
-                            className="mr-2 w-full p-2 border border-gray-300 rounded"
-                        />
-                        <input
-                            type="file"
-                            onChange={(e) => handleImageChange(imageIndex, 'file', e.target.files[0])}
-                            className="mr-2"
-                        />
-                        {image.file && <p className="text-gray-500">{image.file.name}</p>}
-                        <button
-                            type="button"
-                            onClick={() => handleRemoveImage(imageIndex)}
-                            className="mt-2 px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600"
-                            aria-label={`Remove Image ${imageIndex + 1}`}
-                        >
-                            ×
-                        </button>
+                    <div key={imageIndex} className="mb-4">
+                        <div className="flex items-center mb-2">
+                            <input
+                                type="text"
+                                value={image.title}
+                                onChange={(e) => handleImageChange(imageIndex, 'title', e.target.value)}
+                                placeholder={`Image Title ${imageIndex + 1}`}
+                                className="w-full mr-2 p-2 border border-gray-300 rounded"
+                            />
+                            <button
+                                type="button"
+                                onClick={() => handleRemoveImage(imageIndex)}
+                                className="mt-2 px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600"
+                                aria-label={`Remove Image ${imageIndex + 1}`}
+                            >
+                                ×
+                            </button>
+                            {/* Hidden File Input */}
+                            <input
+                                id={`file-input-${imageIndex}`}
+                                type="file"
+                                onChange={(e) => handleImageChange(imageIndex, 'file', e.target.files[0])}
+                                className="hidden"
+                            />
+                        </div>
+                        {/* Clickable Image Preview */}
+                        <div onClick={() => handleImageClick(imageIndex)} className="cursor-pointer w-full">
+                            {image.previewUrl ? (
+                                <img
+                                    src={image.previewUrl}
+                                    alt={image.title || `Preview ${imageIndex + 1}`}
+                                    className="w-full object-cover border rounded"
+                                />
+                            ) : (
+                                <div className="w-full h-32 flex items-center justify-center bg-gray-200 border rounded">
+                                    <span className="text-gray-500">Select Image</span>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 ))}
                 <button
@@ -184,30 +214,31 @@ const TopicForm = ({ index, topic, onTopicChange, handleRemoveTopic }) => {
                 </button>
             </div>
 
-            {/* Videos Section */}
+
+            {/* links Section */}
             <div>
-                <h6 className="text-md font-semibold">Videos</h6>
-                {(topicData.videos || []).map((video, videoIndex) => (
-                    <div key={videoIndex} className="flex items-center mb-2">
+                <h6 className="text-md font-semibold">Links</h6>
+                {(topicData.links || []).map((link, linkIndex) => (
+                    <div key={linkIndex} className="flex items-center mb-2">
                         <input
                             type="text"
-                            value={video.title}
-                            onChange={(e) => handleVideoChange(videoIndex, 'title', e.target.value)}
-                            placeholder={`Video Title ${videoIndex + 1}`}
+                            value={link.title}
+                            onChange={(e) => handlelinkChange(linkIndex, 'title', e.target.value)}
+                            placeholder={`Link Title ${linkIndex + 1}`}
                             className="mr-2 w-full p-2 border border-gray-300 rounded"
                         />
                         <input
                             type="text"
-                            value={video.url}
-                            onChange={(e) => handleVideoChange(videoIndex, 'url', e.target.value)}
-                            placeholder="Video URL"
+                            value={link.url}
+                            onChange={(e) => handlelinkChange(linkIndex, 'url', e.target.value)}
+                            placeholder="link URL"
                             className="mr-2 w-full p-2 border border-gray-300 rounded"
                         />
                         <button
                             type="button"
-                            onClick={() => handleRemoveVideo(videoIndex)}
+                            onClick={() => handleRemovelink(linkIndex)}
                             className="mt-2 px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600"
-                            aria-label={`Remove Video ${videoIndex + 1}`}
+                            aria-label={`Remove link ${linkIndex + 1}`}
                         >
                             ×
                         </button>
@@ -215,10 +246,10 @@ const TopicForm = ({ index, topic, onTopicChange, handleRemoveTopic }) => {
                 ))}
                 <button
                     type="button"
-                    onClick={handleAddVideo}
+                    onClick={handleAddlink}
                     className="mt-2 p-2 bg-blue-500 text-white rounded hover:bg-blue-600"
                 >
-                    Add Video
+                    Add link
                 </button>
             </div>
         </div>

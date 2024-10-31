@@ -28,8 +28,8 @@ const topicSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,  // Array of references to files in GridFS (PDFs, images, etc.)
         ref: 'fs.files'  // GridFS collection for storing files
     }],
-    video: {
-        type: [String],  // Optional media (e.g., video URLs)
+    links: {
+        type: [String],  // Optional media
         default: []
     },
     duration: {
