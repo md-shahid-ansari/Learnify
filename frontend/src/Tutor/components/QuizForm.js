@@ -122,7 +122,7 @@ const QuizForm = ({ index, quiz, onQuizChange, handleRemoveQuiz }) => {
                                 questionType: e.target.value
                             })
                         }
-                        className="mb-2 p-2 border border-gray-300 rounded"
+                        className="mb-2 mr-2 p-2 border border-gray-300 rounded"
                     >
                         <option value="multiple-choice">Multiple Choice</option>
                         <option value="true/false">True/False</option>
