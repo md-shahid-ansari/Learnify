@@ -16,11 +16,6 @@ const moduleSchema = new mongoose.Schema({
         type: String,
         required: true  // Overview of the module’s content and learning objectives
     },
-    tutor: {
-        type: mongoose.Schema.Types.ObjectId,  // Reference to the mentor (User)
-        ref: 'Tutor',
-        required: true
-    },
     lessons: [{
         type: mongoose.Schema.Types.ObjectId,  // Reference to Topic model
         ref: 'Lesson'

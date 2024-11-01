@@ -16,11 +16,11 @@ const courseSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    tutor: [{
+    tutor: {
         type: mongoose.Schema.Types.ObjectId,  // Reference to the mentor (or instructor)
         ref: 'Tutor',
         required: true
-    }],
+    },
     modules: [{
         type: mongoose.Schema.Types.ObjectId,  // Reference to Module model
         ref: 'Module'

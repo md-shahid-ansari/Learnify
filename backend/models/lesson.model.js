@@ -16,11 +16,6 @@ const lessonSchema = new mongoose.Schema({
         type: String,
         required: true  // Overview of the lesson’s content
     },
-    module: {
-        type: mongoose.Schema.Types.ObjectId,  // Reference to the parent Module
-        ref: 'Module',
-        required: true
-    },
     topics: [{
         type: mongoose.Schema.Types.ObjectId,  // Reference to Topic model
         ref: 'Topic'

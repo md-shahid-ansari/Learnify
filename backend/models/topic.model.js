@@ -20,10 +20,6 @@ const topicSchema = new mongoose.Schema({
         type: [String],  // Key outcomes students should achieve after completing the topic
         default: []
     },
-    references: {
-        type: [String],  // External references or links for additional reading
-        default: []
-    },
     images: [{
         type: mongoose.Schema.Types.ObjectId,  // Array of references to files in GridFS (PDFs, images, etc.)
         ref: 'fs.files'  // GridFS collection for storing files
@@ -31,10 +27,6 @@ const topicSchema = new mongoose.Schema({
     links: {
         type: [String],  // Optional media
         default: []
-    },
-    duration: {
-        type: Number,  // Estimated duration (in minutes) to complete the topic
-        default: 0
     },
     dateCreated: {
         type: Date,

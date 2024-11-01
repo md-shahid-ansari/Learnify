@@ -35,10 +35,6 @@ const quizSchema = new mongoose.Schema({
             required: true
         }
     }],
-    duration: {
-        type: Number,  // Estimated time (in minutes) to complete the quiz
-        default: 0
-    },
     dateCreated: {
         type: Date,
         default: Date.now
