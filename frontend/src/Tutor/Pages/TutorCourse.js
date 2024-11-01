@@ -3,7 +3,9 @@ import CourseForm from '../components/CourseForm'; // Course component to handle
 import { IsTutorSessionLive } from '../utils/IsTutorSessionLive';
 import { useNavigate } from 'react-router-dom';
 import { showSuccessToast, showErrorToast} from '../../Toast/toasts';
+import axios from 'axios';
 
+const URL = process.env.REACT_APP_BACKEND_URL;
 
 const TutorCourse = () => {
     const [course, setCourse] = useState({ title: '', description: '', modules: [], certificate: null });
@@ -86,23 +88,118 @@ const TutorCourse = () => {
         return emptyFields;
     };
 
-    const handleSubmit = () => {
+    // const handleSubmit = async () => {
+    //     if (!course.title || !course.description) { 
+    //         showErrorToast("Please provide course title and description.");
+    //         return;
+    //     }
+    //     console.log(course)
+    //     const emptyFields = findEmptyFields(course);
+    //     if (emptyFields.length > 0) {
+    //         showErrorToast(`Please fill out the following fields:\n- ${emptyFields.join("\n- ")}`);
+    //         return;
+    //     }
+
+    //     try {
+    //         const response = await axios.post(`${URL}/api/auth/create-course`, {
+    //             course : course
+    //         });
+      
+    //         if (response.data.success) {
+    //             showSuccessToast("Course created successfully!");
+    //         } else {
+    //             showErrorToast("Course creation failed!");
+    //         }
+    //       } catch (err) {
+    //         // Handle different error cases
+    //         if (err.response) {
+    //             showErrorToast(err.response.data.message || 'Something went wrong.');
+    //         } else {
+    //             showErrorToast('Server is not responding.');
+    //         }
+    //       }
+    // };
+    const handleSubmit = async () => {
+        // Basic validation
         if (!course.title || !course.description) { 
             showErrorToast("Please provide course title and description.");
             return;
         }
-
+    
         const emptyFields = findEmptyFields(course);
         if (emptyFields.length > 0) {
             showErrorToast(`Please fill out the following fields:\n- ${emptyFields.join("\n- ")}`);
             return;
         }
-
-        console.log("Course submitted:", course);
-        showSuccessToast("Course submitted successfully!");
-        // You can also make a POST request to a server here with the course data.
+    
+        try {
+            const formData = new FormData();
+            formData.append("title", course.title);
+            formData.append("description", course.description);
+    
+            // Loop through modules, lessons, topics, and images
+            course.modules.forEach((module, moduleIndex) => {
+                formData.append(`modules[${moduleIndex}][title]`, module.title);
+                formData.append(`modules[${moduleIndex}][description]`, module.description);
+    
+                module.lessons.forEach((lesson, lessonIndex) => {
+                    formData.append(`modules[${moduleIndex}][lessons][${lessonIndex}][title]`, lesson.title);
+                    formData.append(`modules[${moduleIndex}][lessons][${lessonIndex}][description]`, lesson.description);
+    
+                    lesson.topics.forEach((topic, topicIndex) => {
+                        formData.append(`modules[${moduleIndex}][lessons][${lessonIndex}][topics][${topicIndex}][title]`, topic.title);
+                        formData.append(`modules[${moduleIndex}][lessons][${lessonIndex}][topics][${topicIndex}][content]`, topic.content);
+    
+                        topic.images.forEach((image, imageIndex) => {
+                            formData.append(
+                                `modules[${moduleIndex}][lessons][${lessonIndex}][topics][${topicIndex}][images][${imageIndex}][title]`,
+                                image.title
+                            );
+                            if (image.file) {
+                                formData.append(
+                                    `modules[${moduleIndex}][lessons][${lessonIndex}][topics][${topicIndex}][images][${imageIndex}][file]`,
+                                    image.file
+                                );
+                            }
+                        });
+    
+                        topic.links.forEach((link, linkIndex) => {
+                            formData.append(
+                                `modules[${moduleIndex}][lessons][${lessonIndex}][topics][${topicIndex}][links][${linkIndex}][title]`,
+                                link.title
+                            );
+                            formData.append(
+                                `modules[${moduleIndex}][lessons][${lessonIndex}][topics][${topicIndex}][links][${linkIndex}][url]`,
+                                link.url
+                            );
+                        });
+                    });
+                });
+            });
+    
+            // Send the request
+            const response = await axios.post(`${URL}/api/auth/create-course`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+    
+            if (response.data.success) {
+                showSuccessToast("Course created successfully!");
+            } else {
+                showErrorToast(response.data.message || "Course creation failed!");
+            }
+        } catch (err) {
+            if (err.response && err.response.data && err.response.data.message) {
+                showErrorToast(err.response.data.message);
+            } else if (err.message) {
+                showErrorToast(`Error: ${err.message}`);
+            } else {
+                showErrorToast("Server is not responding.");
+            }
+        }
     };
-
+    
 
 
 

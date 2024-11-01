@@ -24,9 +24,12 @@ import {
     adminLogout,
     authAdmin
 } from "../controllers/auth.controllers.js";
+
 import { verifyAdmin } from "../midlayer/verifyAdmin.js";
 import { verifyStudent } from "../midlayer/verifyStudent.js";
 import { verifyTutor } from "../midlayer/verifyTutor.js";
+
+import { createCourse } from "../controllers/tutor.controller.js";
 
 
 const router = express.Router();
@@ -57,6 +60,9 @@ router.post("/admin-forgot", adminForgot);
 router.post("/admin-reset/:token", adminReset);
 router.post("/admin-logout", adminLogout);
 router.get("/admin-auth", verifyAdmin, authAdmin);
+
+
+router.post("/create-course", createCourse);
 
 
 export default router;

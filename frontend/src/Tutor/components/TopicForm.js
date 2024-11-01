@@ -63,12 +63,16 @@ const TopicForm = ({ index, topic, onTopicChange, handleRemoveTopic }) => {
             const updatedImages = [...prevTopicData.images];
             updatedImages[index] = {
                 ...updatedImages[index],
-                [field]: field === 'file' ? value : value,
-                previewUrl: field === 'file' ? URL.createObjectURL(value) : updatedImages[index].previewUrl
+                [field]: value,
+                previewUrl: field === 'file' ? URL.createObjectURL(value) : updatedImages[index].previewUrl,
+                file: field === 'file' ? value : updatedImages[index].file // Store the actual file object
             };
-            return { ...prevTopicData, images: updatedImages };
+            const updatedData = { ...prevTopicData, images: updatedImages };
+            updateTopicData(updatedData);
+            return updatedData;
         });
     };
+    
 
     // Function to trigger file input click
     const handleImageClick = (index) => {

@@ -21,8 +21,13 @@ const topicSchema = new mongoose.Schema({
         default: []
     },
     images: [{
+        title:{
+            type: String,
+            required: true
+        },
         type: mongoose.Schema.Types.ObjectId,  // Array of references to files in GridFS (PDFs, images, etc.)
-        ref: 'fs.files'  // GridFS collection for storing files
+        ref: 'fs.files',  // GridFS collection for storing files
+        required: true
     }],
     links: {
         type: [String],  // Optional media
