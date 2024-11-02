@@ -14,25 +14,47 @@ const TutorCourse = () => {
     const [isCertificateFieldVisible, setIsCertificateFieldVisible] = useState(false);
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
-    const [tutor, setTutor] = useState([])
+    const [tutor, setTutor] = useState([]);
+    const [courses, setCourses] = useState([]);
 
     useEffect(() => {
-        const authenticate= async () => {
+        const authenticate = async () => {
             const { isAuthenticated, tutorData } = await IsTutorSessionLive();
-      
+    
             if (!isAuthenticated) {
-              showErrorToast('You are not authenticated. Please log in again.');
-              navigate('/login-page');
-              setLoading(false);
-              return;
+                showErrorToast('You are not authenticated. Please log in again.');
+                navigate('/login-page');
+                setLoading(false);
+                return;
             }
-            if(tutorData){
+    
+            if (tutorData) {
                 setTutor(tutorData);
+                // Now we will fetch courses only after setting the tutor
+                fetchCourses(tutorData._id);
             }
+    
             setLoading(false);
         };
+    
         authenticate();
-    });
+    }, [navigate]); // Only depend on navigate
+    
+    const fetchCourses = async (tutorId) => {
+        try {
+            const response = await axios.post(`${URL}/api/auth/fetch-courses`, {
+                tutorId
+            });
+    
+            if (response.data.success) {
+                setCourses(response.data.courses);
+                console.log(response.data.courses); // Log fetched courses
+            }
+        } catch (error) {
+            console.error("Error fetching courses:", error);
+        }
+    };
+    
 
     const handleAddCourse = () => {
         setIsCourseCreated(true); // Set to true when creating a course
@@ -144,7 +166,7 @@ const TutorCourse = () => {
                     }
                 }
             }
-
+            
             // now send the course data.
             const response = await axios.post(`${URL}/api/auth/create-course`, {
                 course : course,
@@ -153,21 +175,21 @@ const TutorCourse = () => {
       
             if (response.data.success) {
                 showSuccessToast("Course created successfully!");
+
+                //close the form
+                handleCancel();
             } else {
                 showErrorToast("Course creation failed!");
             }
           } catch (err) {
             // Handle different error cases
             if (err.response) {
-                showErrorToast(err.response.data.message || 'Something went wrong.');
+                showErrorToast(err.response.error || 'Something went wrong.');
             } else {
                 showErrorToast('Server is not responding.');
             }
           }
     };
-    
-
-
 
 
     const handleCancel = () => {
@@ -248,7 +270,7 @@ const TutorCourse = () => {
 
             {/* Submit and Cancel Buttons */}
             {isCourseCreated && (
-                <div className="flex space-x-4 mt-6">
+                <div className="flex space-x-4 mt-6 mb-4">
                     <button 
                         onClick={handleSubmit} 
                         className="bg-green-500 text-white px-4 py-2 rounded"
@@ -263,6 +285,46 @@ const TutorCourse = () => {
                     </button>
                 </div>
             )}
+
+            {/* All courses */}
+            {courses.map((course, index) => (
+                <div key={index} className="bg-white p-4 rounded mb-4 shadow-md">
+                    <h2 className="text-lg font-bold mb-2">{course.title}</h2>
+                    <p className="mb-2">{course.description}</p>
+
+                    {/* Display modules for the course */}
+                    {course.modules && course.modules.length > 0 && (
+                        <div className="mb-2">
+                            <h3 className="font-semibold">Modules:</h3>
+                            <ul className="list-disc list-inside">
+                                {course.modules.map((module, moduleIndex) => (
+                                    <li key={moduleIndex} className="ml-4">
+                                        {module.title}
+                                        {/* Display lessons within each module */}
+                                        {module.lessons && module.lessons.length > 0 && (
+                                            <ul className="list-decimal list-inside ml-4">
+                                                {module.lessons.map((lesson, lessonIndex) => (
+                                                    <li key={lessonIndex}>{lesson.title}</li>
+                                                ))}
+                                            </ul>
+                                        )}
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
+
+                    {/* Edit/View Button - add functionality as needed */}
+                    <div className="flex space-x-4 mt-2">
+                        <button className="bg-yellow-500 text-white px-3 py-1 rounded">
+                            Edit Course
+                        </button>
+                        <button className="bg-blue-500 text-white px-3 py-1 rounded">
+                            View Details
+                        </button>
+                    </div>
+                </div>
+            ))}
         </div>
     );
 };

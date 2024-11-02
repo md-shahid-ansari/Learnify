@@ -21,18 +21,30 @@ const topicSchema = new mongoose.Schema({
         default: []
     },
     images: [{
-        title:{
+        title: {
+            type: String,
+            required: true,
+        },
+        fileId: {
+            type: mongoose.Schema.Types.ObjectId,  // Array of references to files in GridFS (PDFs, images, etc.)
+            ref: 'fs.files',  // GridFS collection for storing files
+            required: true
+        },
+        filename: {
+            type: String,
+            required: true,
+        }
+    }],
+    links: [{
+        title: {
             type: String,
             required: true
         },
-        type: mongoose.Schema.Types.ObjectId,  // Array of references to files in GridFS (PDFs, images, etc.)
-        ref: 'fs.files',  // GridFS collection for storing files
-        required: true
+        url: {
+            type: String,
+            required: true
+        }
     }],
-    links: {
-        type: [String],  // Optional media
-        default: []
-    },
     dateCreated: {
         type: Date,
         default: Date.now

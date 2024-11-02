@@ -52,7 +52,7 @@ export const uploadImage = (req, res) => {
 
 export const createCourse = async (req, res) => {
     const { course , tutorId } = req.body;
-
+ 
     // Validate input
     if (!course || !course.title || !course.description) {
         return res.status(400).json({ error: "Course title and description are required." });
@@ -149,5 +149,38 @@ export const createCourse = async (req, res) => {
     } catch (error) {
         console.error("Error creating course:", error);
         res.status(500).json({ error: "An error occurred while creating the course." });
+    }
+};
+
+
+export const fetchCourses = async (req, res) => {
+    const { tutorId } = req.body;
+
+    // Validate input
+    if (!tutorId) {
+        return res.status(400).json({ error: "Tutor ID is required." });
+    }
+
+    try {
+        // Fetch all courses with the specified tutorId
+        const courses = await Course.find({ tutor: tutorId }).populate({
+            path: 'modules',
+            populate: [
+                {
+                    path: 'lessons',
+                    populate: { path: 'topics' }
+                },
+                { path: 'quizzes' }
+            ]
+        });
+
+        // Return the courses in the response
+        res.status(200).json({
+            success: true,
+            courses,
+        });
+    } catch (error) {
+        console.error("Error fetching courses:", error);
+        res.status(500).json({ error: "An error occurred while fetching courses." });
     }
 };

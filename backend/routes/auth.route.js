@@ -31,6 +31,7 @@ import { verifyTutor } from "../midlayer/verifyTutor.js";
 
 import { 
     createCourse, 
+    fetchCourses, 
     uploadImage 
 } from "../controllers/tutor.controller.js";
 
@@ -66,6 +67,7 @@ router.get("/admin-auth", verifyAdmin, authAdmin);
 
 router.post("/upload-image", uploadImage);
 router.post("/create-course", createCourse);
+router.post("/fetch-courses", fetchCourses);
 
 
 export default router;
