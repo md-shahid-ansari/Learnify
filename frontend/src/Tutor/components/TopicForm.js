@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { nanoid } from 'nanoid';
 
 const TopicForm = ({ index, topic, onTopicChange, handleRemoveTopic }) => {
     const [topicData, setTopicData] = useState({
@@ -44,60 +45,58 @@ const TopicForm = ({ index, topic, onTopicChange, handleRemoveTopic }) => {
     };
 
     const handleAddImage = () => {
-        const newImage = { title: '', file: null };
+        const newImage = { id: nanoid(), title: '', file: null, previewUrl: null };
         updateTopicData({
             ...topicData,
             images: [...(topicData.images || []), newImage]
         });
     };
 
-    const handleRemoveImage = (imageIndex) => {
-        const updatedImages = (topicData.images || []).filter((_, i) => i !== imageIndex);
+    const handleRemoveImage = (imageId) => {
+        const updatedImages = (topicData.images || []).filter((image) => image.id !== imageId);
         updateTopicData({ ...topicData, images: updatedImages });
     };
 
-    
-    // Function to handle image changes
-    const handleImageChange = (index, field, value) => {
+    const handleImageChange = (imageId, field, value) => {
         setTopicData((prevTopicData) => {
-            const updatedImages = [...prevTopicData.images];
-            updatedImages[index] = {
-                ...updatedImages[index],
-                [field]: value,
-                previewUrl: field === 'file' ? URL.createObjectURL(value) : updatedImages[index].previewUrl,
-                file: field === 'file' ? value : updatedImages[index].file // Store the actual file object
-            };
+            const updatedImages = (prevTopicData.images || []).map((image) => 
+                image.id === imageId
+                    ? {
+                          ...image,
+                          [field]: value,
+                          previewUrl: field === 'file' ? URL.createObjectURL(value) : image.previewUrl,
+                          file: field === 'file' ? value : image.file
+                      }
+                    : image
+            );
             const updatedData = { ...prevTopicData, images: updatedImages };
             updateTopicData(updatedData);
             return updatedData;
         });
     };
-    
 
-    // Function to trigger file input click
-    const handleImageClick = (index) => {
-        document.getElementById(`file-input-${index}`).click();
+    const handleImageClick = (imageId) => {
+        document.getElementById(`file-input-${imageId}`).click();
     };
 
-
     const handleAddlink = () => {
-        const newlink = { title: '', url: '' };
+        const newLink = { id: nanoid(), title: '', url: '' };
         updateTopicData({
             ...topicData,
-            links: [...(topicData.links || []), newlink]
+            links: [...(topicData.links || []), newLink]
         });
     };
 
-    const handleRemovelink = (linkIndex) => {
-        const updatedlinks = (topicData.links || []).filter((_, i) => i !== linkIndex);
-        updateTopicData({ ...topicData, links: updatedlinks });
+    const handleRemovelink = (linkId) => {
+        const updatedLinks = (topicData.links || []).filter((link) => link.id !== linkId);
+        updateTopicData({ ...topicData, links: updatedLinks });
     };
 
-    const handlelinkChange = (linkIndex, field, value) => {
-        const updatedlinks = (topicData.links || []).map((link, i) =>
-            i === linkIndex ? { ...link, [field]: value } : link
+    const handleLinkChange = (linkId, field, value) => {
+        const updatedLinks = (topicData.links || []).map((link) =>
+            link.id === linkId ? { ...link, [field]: value } : link
         );
-        updateTopicData({ ...topicData, links: updatedlinks });
+        updateTopicData({ ...topicData, links: updatedLinks });
     };
 
     return (
@@ -167,38 +166,36 @@ const TopicForm = ({ index, topic, onTopicChange, handleRemoveTopic }) => {
             {/* Images Section */}
             <div className="mb-4">
                 <h6 className="text-md font-semibold">Images</h6>
-                {(topicData.images || []).map((image, imageIndex) => (
-                    <div key={imageIndex} className="mb-4">
+                {(topicData.images || []).map((image) => (
+                    <div key={image.id} className="mb-4">
                         <div className="flex items-center mb-2">
                             <input
                                 type="text"
                                 value={image.title}
-                                onChange={(e) => handleImageChange(imageIndex, 'title', e.target.value)}
-                                placeholder={`Image Title ${imageIndex + 1}`}
+                                onChange={(e) => handleImageChange(image.id, 'title', e.target.value)}
+                                placeholder={`Image Title`}
                                 className="w-full mr-2 p-2 border border-gray-300 rounded"
                             />
                             <button
                                 type="button"
-                                onClick={() => handleRemoveImage(imageIndex)}
+                                onClick={() => handleRemoveImage(image.id)}
                                 className="mt-2 px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600"
-                                aria-label={`Remove Image ${imageIndex + 1}`}
+                                aria-label={`Remove Image`}
                             >
                                 ×
                             </button>
-                            {/* Hidden File Input */}
                             <input
-                                id={`file-input-${imageIndex}`}
+                                id={`file-input-${image.id}`}
                                 type="file"
-                                onChange={(e) => handleImageChange(imageIndex, 'file', e.target.files[0])}
+                                onChange={(e) => handleImageChange(image.id, 'file', e.target.files[0])}
                                 className="hidden"
                             />
                         </div>
-                        {/* Clickable Image Preview */}
-                        <div onClick={() => handleImageClick(imageIndex)} className="cursor-pointer w-full">
+                        <div onClick={() => handleImageClick(image.id)} className="cursor-pointer w-full">
                             {image.previewUrl ? (
                                 <img
                                     src={image.previewUrl}
-                                    alt={image.title || `Preview ${imageIndex + 1}`}
+                                    alt={image.title || `Preview`}
                                     className="w-full object-cover border rounded"
                                 />
                             ) : (
@@ -218,31 +215,30 @@ const TopicForm = ({ index, topic, onTopicChange, handleRemoveTopic }) => {
                 </button>
             </div>
 
-
-            {/* links Section */}
+            {/* Links Section */}
             <div>
                 <h6 className="text-md font-semibold">Links</h6>
-                {(topicData.links || []).map((link, linkIndex) => (
-                    <div key={linkIndex} className="flex items-center mb-2">
+                {(topicData.links || []).map((link) => (
+                    <div key={link.id} className="flex items-center mb-2">
                         <input
                             type="text"
                             value={link.title}
-                            onChange={(e) => handlelinkChange(linkIndex, 'title', e.target.value)}
-                            placeholder={`Link Title ${linkIndex + 1}`}
+                            onChange={(e) => handleLinkChange(link.id, 'title', e.target.value)}
+                            placeholder="Link Title"
                             className="mr-2 w-full p-2 border border-gray-300 rounded"
                         />
                         <input
                             type="text"
                             value={link.url}
-                            onChange={(e) => handlelinkChange(linkIndex, 'url', e.target.value)}
-                            placeholder="link URL"
+                            onChange={(e) => handleLinkChange(link.id, 'url', e.target.value)}
+                            placeholder="Link URL"
                             className="mr-2 w-full p-2 border border-gray-300 rounded"
                         />
                         <button
                             type="button"
-                            onClick={() => handleRemovelink(linkIndex)}
+                            onClick={() => handleRemovelink(link.id)}
                             className="mt-2 px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600"
-                            aria-label={`Remove link ${linkIndex + 1}`}
+                            aria-label={`Remove link`}
                         >
                             ×
                         </button>
