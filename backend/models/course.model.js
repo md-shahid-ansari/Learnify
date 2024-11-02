@@ -25,9 +25,15 @@ const courseSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,  // Reference to Module model
         ref: 'Module'
     }],
-    certifications: [{
-        type: mongoose.Schema.Types.ObjectId,  // References to Certification model
-        ref: 'Certification'
+    certificate: [{
+        title: {
+            type: String,
+            required: true
+        },
+        description: {
+            type: String,
+            required: true
+        }
     }],
     dateCreated: {
         type: Date,

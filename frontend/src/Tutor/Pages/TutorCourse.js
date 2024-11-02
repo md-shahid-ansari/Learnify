@@ -88,116 +88,77 @@ const TutorCourse = () => {
         return emptyFields;
     };
 
-    // const handleSubmit = async () => {
-    //     if (!course.title || !course.description) { 
-    //         showErrorToast("Please provide course title and description.");
-    //         return;
-    //     }
-    //     console.log(course)
-    //     const emptyFields = findEmptyFields(course);
-    //     if (emptyFields.length > 0) {
-    //         showErrorToast(`Please fill out the following fields:\n- ${emptyFields.join("\n- ")}`);
-    //         return;
-    //     }
+    const uploadImage = async (file) => {
+        let fileId = '';
+        let fileName = '';
+        if (file) {
+        const formDataFile = new FormData();
+        formDataFile.append('file', file); // Ensure the field name matches 'uploadTestResult'
+    
+        try {
+            const response = await axios.post(`${URL}/api/auth/upload-image`, formDataFile, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+            });
+            fileId = response.data.file.id;
+            fileName = response.data.file.filename;
+        } catch (error) {
+            console.error('Error uploading file:', error);
+            showErrorToast('Error uploading file. Please try again.');
+            return;
+        }
+        }
+        return { fileId, fileName };
+    }
 
-    //     try {
-    //         const response = await axios.post(`${URL}/api/auth/create-course`, {
-    //             course : course
-    //         });
-      
-    //         if (response.data.success) {
-    //             showSuccessToast("Course created successfully!");
-    //         } else {
-    //             showErrorToast("Course creation failed!");
-    //         }
-    //       } catch (err) {
-    //         // Handle different error cases
-    //         if (err.response) {
-    //             showErrorToast(err.response.data.message || 'Something went wrong.');
-    //         } else {
-    //             showErrorToast('Server is not responding.');
-    //         }
-    //       }
-    // };
     const handleSubmit = async () => {
-        // Basic validation
         if (!course.title || !course.description) { 
             showErrorToast("Please provide course title and description.");
             return;
         }
-    
+        
         const emptyFields = findEmptyFields(course);
         if (emptyFields.length > 0) {
             showErrorToast(`Please fill out the following fields:\n- ${emptyFields.join("\n- ")}`);
             return;
         }
-    
+
         try {
-            const formData = new FormData();
-            formData.append("title", course.title);
-            formData.append("description", course.description);
-    
-            // Loop through modules, lessons, topics, and images
-            course.modules.forEach((module, moduleIndex) => {
-                formData.append(`modules[${moduleIndex}][title]`, module.title);
-                formData.append(`modules[${moduleIndex}][description]`, module.description);
-    
-                module.lessons.forEach((lesson, lessonIndex) => {
-                    formData.append(`modules[${moduleIndex}][lessons][${lessonIndex}][title]`, lesson.title);
-                    formData.append(`modules[${moduleIndex}][lessons][${lessonIndex}][description]`, lesson.description);
-    
-                    lesson.topics.forEach((topic, topicIndex) => {
-                        formData.append(`modules[${moduleIndex}][lessons][${lessonIndex}][topics][${topicIndex}][title]`, topic.title);
-                        formData.append(`modules[${moduleIndex}][lessons][${lessonIndex}][topics][${topicIndex}][content]`, topic.content);
-    
-                        topic.images.forEach((image, imageIndex) => {
-                            formData.append(
-                                `modules[${moduleIndex}][lessons][${lessonIndex}][topics][${topicIndex}][images][${imageIndex}][title]`,
-                                image.title
-                            );
+            // Iterate through each image and upload it
+            for (let module of course.modules) {
+                for (let lesson of module.lessons) {
+                    for (let topic of lesson.topics) {
+                        for (let image of topic.images) {
                             if (image.file) {
-                                formData.append(
-                                    `modules[${moduleIndex}][lessons][${lessonIndex}][topics][${topicIndex}][images][${imageIndex}][file]`,
-                                    image.file
-                                );
+                                const uploadedImage = await uploadImage(image.file);
+                                image.filename = uploadedImage.fileName;
+                                image.fileId = uploadedImage.fileId;
+                                delete image.file; // Remove the raw file data to avoid re-uploading
                             }
-                        });
-    
-                        topic.links.forEach((link, linkIndex) => {
-                            formData.append(
-                                `modules[${moduleIndex}][lessons][${lessonIndex}][topics][${topicIndex}][links][${linkIndex}][title]`,
-                                link.title
-                            );
-                            formData.append(
-                                `modules[${moduleIndex}][lessons][${lessonIndex}][topics][${topicIndex}][links][${linkIndex}][url]`,
-                                link.url
-                            );
-                        });
-                    });
-                });
-            });
-    
-            // Send the request
-            const response = await axios.post(`${URL}/api/auth/create-course`, formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
+                        }
+                    }
                 }
+            }
+
+            // now send the course data.
+            const response = await axios.post(`${URL}/api/auth/create-course`, {
+                course : course
             });
-    
+      
             if (response.data.success) {
                 showSuccessToast("Course created successfully!");
             } else {
-                showErrorToast(response.data.message || "Course creation failed!");
+                showErrorToast("Course creation failed!");
             }
-        } catch (err) {
-            if (err.response && err.response.data && err.response.data.message) {
-                showErrorToast(err.response.data.message);
-            } else if (err.message) {
-                showErrorToast(`Error: ${err.message}`);
+          } catch (err) {
+            // Handle different error cases
+            if (err.response) {
+                showErrorToast(err.response.data.message || 'Something went wrong.');
             } else {
-                showErrorToast("Server is not responding.");
+                showErrorToast('Server is not responding.');
             }
-        }
+          }
     };
     
 
