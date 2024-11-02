@@ -14,16 +14,20 @@ const TutorCourse = () => {
     const [isCertificateFieldVisible, setIsCertificateFieldVisible] = useState(false);
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
+    const [tutor, setTutor] = useState([])
 
     useEffect(() => {
         const authenticate= async () => {
-            const { isAuthenticated } = await IsTutorSessionLive();
+            const { isAuthenticated, tutorData } = await IsTutorSessionLive();
       
             if (!isAuthenticated) {
               showErrorToast('You are not authenticated. Please log in again.');
               navigate('/login-page');
               setLoading(false);
               return;
+            }
+            if(tutorData){
+                setTutor(tutorData);
             }
             setLoading(false);
         };
@@ -143,7 +147,8 @@ const TutorCourse = () => {
 
             // now send the course data.
             const response = await axios.post(`${URL}/api/auth/create-course`, {
-                course : course
+                course : course,
+                tutorId: tutor._id
             });
       
             if (response.data.success) {

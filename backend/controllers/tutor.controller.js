@@ -51,7 +51,7 @@ export const uploadImage = (req, res) => {
 
 
 export const createCourse = async (req, res) => {
-    const { course } = req.body;
+    const { course , tutorId } = req.body;
 
     // Validate input
     if (!course || !course.title || !course.description) {
@@ -64,6 +64,7 @@ export const createCourse = async (req, res) => {
             title: course.title,
             description: course.description,
             certificate: course.certificate,
+            tutor: tutorId,
         });
 
         // Save each module, lesson, topic, image, and quiz, and associate with course
