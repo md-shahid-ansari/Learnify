@@ -7,6 +7,7 @@ import {Topic} from '../models/topic.model.js';
 import multer from 'multer';
 import { bucket } from '../db/connectDb.js'; // Import the GridFS instance
 import { Readable } from 'stream';
+import mongoose from 'mongoose';
 
 // Setup multer for file handling
 const storage = multer.memoryStorage();
@@ -153,6 +154,65 @@ export const createCourse = async (req, res) => {
 };
 
 
+// export const fetchCourses = async (req, res) => {
+//     const { tutorId } = req.body;
+
+//     // Validate input
+//     if (!tutorId) {
+//         return res.status(400).json({ error: "Tutor ID is required." });
+//     }
+
+//     try {
+//         // Fetch all courses with the specified tutorId
+//         const courses = await Course.find({ tutor: tutorId }).populate({
+//             path: 'modules',
+//             populate: [
+//                 {
+//                     path: 'lessons',
+//                     populate: { path: 'topics' }
+//                 },
+//                 { path: 'quizzes' }
+//             ]
+//         });
+
+//         // Return the courses in the response
+//         res.status(200).json({
+//             success: true,
+//             courses,
+//         });
+//     } catch (error) {
+//         console.error("Error fetching courses:", error);
+//         res.status(500).json({ error: "An error occurred while fetching courses." });
+//     }
+// };
+
+
+export const getFile = async (req, res) => {
+    const { fileId } = req.params;
+
+    if (!fileId) {
+        return res.status(400).json({ error: "File ID is required." });
+    }
+
+    try {
+        const downloadStream = bucket.openDownloadStream(new mongoose.Types.ObjectId(fileId));
+
+        downloadStream.on('error', (error) => {
+            console.error("Error streaming file:", error);
+            res.status(500).json({ error: "An error occurred while streaming the file." });
+        });
+
+        downloadStream.pipe(res);
+    } catch (error) {
+        console.error("Error retrieving file:", error);
+        res.status(500).json({ error: "An error occurred while retrieving the file." });
+    }
+};
+
+// Helper function to generate URLs for GridFS images
+const URL = process.env.REACT_APP_BACKEND_URL;
+const getImageUrl = (fileId) => `${URL}/api/auth/files/${fileId}`;
+
 export const fetchCourses = async (req, res) => {
     const { tutorId } = req.body;
 
@@ -162,7 +222,7 @@ export const fetchCourses = async (req, res) => {
     }
 
     try {
-        // Fetch all courses with the specified tutorId
+        // Fetch courses with populated structure but without attempting to populate GridFS files
         const courses = await Course.find({ tutor: tutorId }).populate({
             path: 'modules',
             populate: [
@@ -174,13 +234,33 @@ export const fetchCourses = async (req, res) => {
             ]
         });
 
-        // Return the courses in the response
+        // Map through each course to attach image URLs
+        const coursesWithImages = await Promise.all(courses.map(async (course) => {
+            const modules = await Promise.all(course.modules.map(async (module) => {
+                const lessons = await Promise.all(module.lessons.map(async (lesson) => {
+                    const topics = await Promise.all(lesson.topics.map(async (topic) => {
+                        // Attach GridFS image URLs for each image in topic.images
+                        const imagesWithUrls = topic.images.map((image) => ({
+                            ...image.toObject(),
+                            previewUrl: getImageUrl(image.fileId)
+                        }));
+                        return { ...topic.toObject(), images: imagesWithUrls };
+                    }));
+                    return { ...lesson.toObject(), topics };
+                }));
+                return { ...module.toObject(), lessons };
+            }));
+            return { ...course.toObject(), modules };
+        }));
+
+        // Send the modified response with URLs included
         res.status(200).json({
             success: true,
-            courses,
+            courses: coursesWithImages,
         });
     } catch (error) {
         console.error("Error fetching courses:", error);
         res.status(500).json({ error: "An error occurred while fetching courses." });
     }
 };
+ 

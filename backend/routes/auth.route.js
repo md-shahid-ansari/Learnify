@@ -32,7 +32,8 @@ import { verifyTutor } from "../midlayer/verifyTutor.js";
 import { 
     createCourse, 
     fetchCourses, 
-    uploadImage 
+    uploadImage,
+    getFile
 } from "../controllers/tutor.controller.js";
 
 
@@ -68,6 +69,7 @@ router.get("/admin-auth", verifyAdmin, authAdmin);
 router.post("/upload-image", uploadImage);
 router.post("/create-course", createCourse);
 router.post("/fetch-courses", fetchCourses);
+router.get("/files/:fileId", getFile);
 
 
 export default router;
