@@ -10,6 +10,8 @@ const URL = process.env.REACT_APP_BACKEND_URL;
 const TutorCourse = () => {
     const [course, setCourse] = useState({ title: '', description: '', modules: [], certificate: null });
     const [isCourseCreated, setIsCourseCreated] = useState(false);
+    const [isCourseUpdated, setIsCourseUpdated] = useState(false);
+    const [isShowForm, setIsShowForm] = useState(false);
     const [certificate, setCertificate] = useState({ title: '', description: '' });
     const [isCertificateFieldVisible, setIsCertificateFieldVisible] = useState(false);
     const [loading, setLoading] = useState(true);
@@ -73,6 +75,7 @@ const TutorCourse = () => {
 
     const handleAddCourse = () => {
         setIsCourseCreated(true); // Set to true when creating a course
+        setIsShowForm(true);
     };
 
     const onCourseChange = (updatedCourse) => {
@@ -206,12 +209,20 @@ const TutorCourse = () => {
           }
     };
 
+    const handleUpdate = async () => {
+        console.log(course);
+        handleCancel();
+    }
+
 
     const handleCancel = () => {
         setIsCourseCreated(false); // Hide form and submit button
         setCourse({ title: '', description: '', modules: [], certificate: null }); // Reset the course state
         setCertificate({ title: '', description: '' });
         setIsCertificateFieldVisible(false);
+
+        setIsCourseUpdated(false);
+        setIsShowForm(false);
     };
 
     // Return loading spinner or error message as needed
@@ -227,7 +238,7 @@ const TutorCourse = () => {
             {/* Create Course Button */}
             <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-bold mb-4">Courses</h2>
-                {!isCourseCreated && (
+                {!isCourseCreated && !isCourseUpdated && (
                     <button 
                         onClick={handleAddCourse} 
                         className="bg-blue-500 text-white px-3 py-1 rounded"
@@ -238,7 +249,7 @@ const TutorCourse = () => {
             </div>
 
             
-            {isCourseCreated && (
+            {isShowForm && (
                 <div className="p-4 border border-gray-300 rounded-lg mb-6 bg-white shadow-md">
                     {/* Course Form */}
                     <CourseForm 
@@ -293,6 +304,42 @@ const TutorCourse = () => {
                         Submit Course
                     </button>
                     <button 
+                        onClick={() => {
+                            setIsCourseCreated(false);
+                            setIsShowForm(false)
+                        }} 
+                        className="bg-gray-300 text-black px-4 py-2 rounded"
+                    >
+                        Back
+                    </button>
+                    <button 
+                        onClick={handleCancel} 
+                        className="bg-gray-300 text-black px-4 py-2 rounded"
+                    >
+                        Cancel
+                    </button>
+                </div>
+            )}
+
+            {/* Update and Cancel Buttons */}
+            {isCourseUpdated && (
+                <div className="flex space-x-4 mt-6 mb-4">
+                    <button 
+                        onClick={handleUpdate} 
+                        className="bg-green-500 text-white px-4 py-2 rounded"
+                    >
+                        Update Course
+                    </button>
+                    <button 
+                        onClick={() => {
+                            setIsCourseUpdated(false);
+                            setIsShowForm(false)
+                        }} 
+                        className="bg-gray-300 text-black px-4 py-2 rounded"
+                    >
+                        Back
+                    </button>
+                    <button 
                         onClick={handleCancel} 
                         className="bg-gray-300 text-black px-4 py-2 rounded"
                     >
@@ -302,47 +349,55 @@ const TutorCourse = () => {
             )}
 
             {/* All courses */}
-            {courses.map((course, index) => (
-                <div key={index} className="bg-white p-4 rounded mb-4 shadow-md">
-                    <h2 className="text-lg font-bold mb-2">{course.title}</h2>
-                    <p className="mb-2">{course.description}</p>
+            {!isShowForm && (
+                <>
+                {courses.map((course, index) => (
+                    <div key={index} className="bg-white p-4 rounded mb-4 shadow-md">
+                        <h2 className="text-lg font-bold mb-2">{course.title}</h2>
+                        <p className="mb-2">{course.description}</p>
 
-                    {/* Display modules for the course */}
-                    {course.modules && course.modules.length > 0 && (
-                        <div className="mb-2">
-                            <h3 className="font-semibold">Modules:</h3>
-                            <ul className="list-disc list-inside">
-                                {course.modules.map((module, moduleIndex) => (
-                                    <li key={moduleIndex} className="ml-4">
-                                        {module.title}
-                                        {/* Display lessons within each module */}
-                                        {module.lessons && module.lessons.length > 0 && (
-                                            <ul className="list-decimal list-inside ml-4">
-                                                {module.lessons.map((lesson, lessonIndex) => (
-                                                    <li key={lessonIndex}>{lesson.title}</li>
-                                                ))}
-                                            </ul>
-                                        )}
-                                    </li>
-                                ))}
-                            </ul>
+                        {/* Display modules for the course */}
+                        {course.modules && course.modules.length > 0 && (
+                            <div className="mb-2">
+                                <h3 className="font-semibold">Modules:</h3>
+                                <ul className="list-disc list-inside">
+                                    {course.modules.map((module, moduleIndex) => (
+                                        <li key={moduleIndex} className="ml-4">
+                                            {module.title}
+                                            {/* Display lessons within each module */}
+                                            {module.lessons && module.lessons.length > 0 && (
+                                                <ul className="list-decimal list-inside ml-4">
+                                                    {module.lessons.map((lesson, lessonIndex) => (
+                                                        <li key={lessonIndex}>{lesson.title}</li>
+                                                    ))}
+                                                </ul>
+                                            )}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
+
+                        {/* Edit/View Button - add functionality as needed */}
+                        <div className="flex space-x-4 mt-2">
+                            <button className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600" onClick={() => {
+                                setCourse(course);
+                                setIsCourseUpdated(true);
+                                setIsShowForm(true);
+                            }}>
+                                Edit Course
+                            </button>
+                            <button className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">
+                                View Course
+                            </button>
+                            <button className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600" onClick={() => deleteCourse(course._id)}>
+                                Delete Course
+                            </button>
                         </div>
-                    )}
-
-                    {/* Edit/View Button - add functionality as needed */}
-                    <div className="flex space-x-4 mt-2">
-                        <button className="bg-yellow-500 text-white px-3 py-1 rounded">
-                            Edit Course
-                        </button>
-                        <button className="bg-blue-500 text-white px-3 py-1 rounded">
-                            View Details
-                        </button>
-                        <button className="bg-red-500 text-white px-3 py-1 rounded" onClick={() => deleteCourse(course._id)}>
-                            Delete Course
-                        </button>
                     </div>
-                </div>
-            ))}
+                ))}
+                </>
+            )}
         </div>
     );
 };
