@@ -54,6 +54,21 @@ const TutorCourse = () => {
             console.error("Error fetching courses:", error);
         }
     };
+
+    const deleteCourse = async (courseId) => {
+        try {
+            const response = await axios.post(`${URL}/api/auth/delete-course`, {
+                courseId
+            });
+    
+            if (response.data.success) {
+                fetchCourses(tutor._id);
+                showSuccessToast("Course deleted successfully");
+            }
+        } catch (error) {
+            console.error("Error fetching courses:", error);
+        }
+    };
     
 
     const handleAddCourse = () => {
@@ -175,7 +190,7 @@ const TutorCourse = () => {
       
             if (response.data.success) {
                 showSuccessToast("Course created successfully!");
-
+                fetchCourses(tutor._id);
                 //close the form
                 handleCancel();
             } else {
@@ -321,6 +336,9 @@ const TutorCourse = () => {
                         </button>
                         <button className="bg-blue-500 text-white px-3 py-1 rounded">
                             View Details
+                        </button>
+                        <button className="bg-red-500 text-white px-3 py-1 rounded" onClick={() => deleteCourse(course._id)}>
+                            Delete Course
                         </button>
                     </div>
                 </div>

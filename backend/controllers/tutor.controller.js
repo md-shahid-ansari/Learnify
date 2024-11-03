@@ -265,3 +265,71 @@ export const fetchCourses = async (req, res) => {
 };
  
 
+export const deleteCourse = async (req, res) => {
+    const { courseId } = req.body;
+
+    // Validate input
+    if (!courseId) {
+        return res.status(400).json({ error: "Course ID is required." });
+    }
+
+    try {
+        // Find the course by ID
+        const course = await Course.findById(courseId);
+        if (!course) {
+            return res.status(404).json({ error: "Course not found." });
+        }
+
+        // Iterate through modules to delete lessons, topics, quizzes, and images
+        for (const moduleId of course.modules) {
+            const module = await Module.findById(moduleId);
+
+            if (module) {
+                // Delete lessons within the module
+                for (const lessonId of module.lessons) {
+                    const lesson = await Lesson.findById(lessonId);
+
+                    if (lesson) {
+                        // Delete topics within the lesson
+                        for (const topicId of lesson.topics) {
+                            const topic = await Topic.findById(topicId);
+
+                            if (topic) {
+                                // Delete images associated with each topic in GridFS
+                                for (const image of topic.images) {
+                                    await bucket.delete(new mongoose.Types.ObjectId(image.fileId));
+                                }
+
+                                // Delete the topic itself
+                                await topic.deleteOne();
+                            }
+                        }
+
+                        // Delete the lesson itself
+                        await lesson.deleteOne();
+                    }
+                }
+
+                // Delete quizzes within the module
+                for (const quizId of module.quizzes) {
+                    await Quiz.findByIdAndDelete(quizId);
+                }
+
+                // Delete the module itself
+                await module.deleteOne();
+            }
+        }
+
+        // Delete the course itself
+        await course.deleteOne();
+
+        res.status(200).json({
+            success: true,
+            message: "Course and all associated data deleted successfully!",
+        });
+    } catch (error) {
+        console.error("Error deleting course:", error);
+        res.status(500).json({ error: "An error occurred while deleting the course." });
+    }
+};
+
