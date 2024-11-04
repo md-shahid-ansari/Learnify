@@ -12,10 +12,6 @@ const quizSchema = new mongoose.Schema({
         type: String,
         required: true  // Title of the quiz
     },
-    description: {
-        type: String,  // Brief overview of the quiz
-        default: ""
-    },
     questions: [{
         questionText: {
             type: String,

@@ -334,31 +334,41 @@ export const deleteCourse = async (req, res) => {
 };
 
 export const updateCourse = async (req, res) => {
-    const {course, tutorId } = req.body;
-    
+    const { course, tutorId } = req.body;
+
     if (!course || !course.title || !course.description) {
         return res.status(400).json({ error: "Course ID, title, and description are required." });
     }
 
     try {
-        console.log(course._id)
-        // Find and update main course fields
-        const updatedCourse = await Course.findByIdAndUpdate(course._id, {
-            title: course.title,
-            description: course.description,
-            certificate: course.certificate,
-            tutor: tutorId,
-        }, { new: true });
+        // Find and update the main course fields, or create a new course if needed
+        let updatedCourse = course._id 
+            ? await Course.findByIdAndUpdate(course._id, {
+                title: course.title,
+                description: course.description,
+                certificate: course.certificate,
+                tutor: tutorId,
+            }, { new: true })
+            : new Course({
+                title: course.title,
+                description: course.description,
+                certificate: course.certificate,
+                tutor: tutorId,
+            });
 
         if (!updatedCourse) {
             return res.status(404).json({ error: "Course not found." });
         }
-        console.log(updatedCourse)
-        // Loop through and update modules, lessons, topics, images, and quizzes
+
+        const moduleIds = [];
+        const lessonIds = [];
+        const topicIds = [];
+        const quizIds = [];
+
         for (const moduleData of course.modules) {
             let module;
 
-            // Update or create module
+            // Update or create Module
             if (moduleData._id) {
                 module = await Module.findByIdAndUpdate(moduleData._id, {
                     title: moduleData.title,
@@ -372,12 +382,12 @@ export const updateCourse = async (req, res) => {
                 await module.save();
                 updatedCourse.modules.push(module._id);
             }
+            moduleIds.push(module._id);
 
-            // Process each lesson within the module
             for (const lessonData of moduleData.lessons) {
                 let lesson;
 
-                // Update or create lesson
+                // Update or create Lesson
                 if (lessonData._id) {
                     lesson = await Lesson.findByIdAndUpdate(lessonData._id, {
                         title: lessonData.title,
@@ -391,78 +401,88 @@ export const updateCourse = async (req, res) => {
                     await lesson.save();
                     module.lessons.push(lesson._id);
                 }
+                lessonIds.push(lesson._id);
 
-                // Process each topic within the lesson
                 for (const topicData of lessonData.topics) {
                     let topic;
 
-                    // Update or create topic
+                    // Update or create Topic
                     if (topicData._id) {
                         topic = await Topic.findByIdAndUpdate(topicData._id, {
                             title: topicData.title,
                             content: topicData.content,
                             learningOutcomes: topicData.learningOutcomes,
+                            links: topicData.links,
                         }, { new: true });
+
+                        // Handle image deletion and update
+                        const existingImageIds = topic.images.map(image => image.fileId.toString());
+                        const updatedImageIds = topicData.images.map(image => image.fileId);
+
+                        const imagesToDelete = existingImageIds.filter(id => !updatedImageIds.includes(id));
+                        for (const imageId of imagesToDelete) {
+                            await bucket.delete(new mongoose.Types.ObjectId(imageId));
+                        }
+
+                        topic.images = topicData.images.map(image => ({
+                            title: image.title,
+                            fileId: image.fileId,
+                            filename: image.filename,
+                        }));
                     } else {
                         topic = new Topic({
                             title: topicData.title,
                             content: topicData.content,
                             learningOutcomes: topicData.learningOutcomes,
+                            images: topicData.images.map(image => ({
+                                title: image.title,
+                                fileId: image.fileId,
+                                filename: image.filename,
+                            })),
+                            links: topicData.links,
                         });
                         await topic.save();
                         lesson.topics.push(topic._id);
                     }
-
-                    // Update images and links for the topic
-                    topic.images = topicData.images.map(image => ({
-                        title: image.title,
-                        fileId: image.fileId,
-                        filename: image.filename,
-                    }));
-                    topic.links = topicData.links;
-
+                    topicIds.push(topic._id);
                     await topic.save();
                 }
 
                 await lesson.save();
             }
 
-            // Process quizzes within the module
             for (const quizData of moduleData.quizzes) {
                 let quiz;
 
+                // Update or create Quiz
                 if (quizData._id) {
-                    // Update existing quiz
                     quiz = await Quiz.findById(quizData._id);
 
-                    // Update quiz title
-                    quiz.title = quizData.title;
-
-                    // Update or add questions
-                    quiz.questions = quizData.questions.map(questionData => {
-                        if (questionData._id) {
-                            // Find and update existing question
-                            const existingQuestion = quiz.questions.id(questionData._id);
-                            if (existingQuestion) {
-                                existingQuestion.questionText = questionData.questionText;
-                                existingQuestion.questionType = questionData.questionType;
-                                existingQuestion.options = questionData.options;
-                                existingQuestion.correctAnswer = questionData.correctAnswer;
-                                return existingQuestion;
+                    if (quiz) {
+                        quiz.title = quizData.title;
+                        // Ensure quiz.questions is an array
+                        quiz.questions = quiz.questions || [];
+                        quiz.questions = quizData.questions.map(questionData => {
+                            if (questionData._id) {
+                                const existingQuestion = quiz.questions.id(questionData._id);
+                                if (existingQuestion) {
+                                    existingQuestion.questionText = questionData.questionText;
+                                    existingQuestion.questionType = questionData.questionType;
+                                    existingQuestion.options = questionData.options;
+                                    existingQuestion.correctAnswer = questionData.correctAnswer;
+                                    return existingQuestion;
+                                }
                             }
-                        }
-                        // Create new question if `_id` is not found
-                        return {
-                            questionText: questionData.questionText,
-                            questionType: questionData.questionType,
-                            options: questionData.options,
-                            correctAnswer: questionData.correctAnswer,
-                        };
-                    });
-
-                    await quiz.save();
+                            return {
+                                questionText: questionData.questionText,
+                                questionType: questionData.questionType,
+                                options: questionData.options,
+                                correctAnswer: questionData.correctAnswer,
+                            };
+                        });
+                        await quiz.save();
+                    }
                 } else {
-                    // Create new quiz if no `_id` is provided
                     quiz = new Quiz({
                         title: quizData.title,
                         questions: quizData.questions.map(question => ({
@@ -475,15 +495,20 @@ export const updateCourse = async (req, res) => {
                     await quiz.save();
                     module.quizzes.push(quiz._id);
                 }
+                quizIds.push(quiz._id);
             }
 
             await module.save();
         }
 
-        // Save the course document with all updates
+        // Delete any modules, lessons, topics, and quizzes that were not in the update
+        await Module.deleteMany({ _id: { $nin: moduleIds } });
+        await Lesson.deleteMany({ _id: { $nin: lessonIds } });
+        await Topic.deleteMany({ _id: { $nin: topicIds } });
+        await Quiz.deleteMany({ _id: { $nin: quizIds } });
+
         await updatedCourse.save();
 
-        // Send success response
         res.status(200).json({
             success: true,
             message: "Course updated successfully!",

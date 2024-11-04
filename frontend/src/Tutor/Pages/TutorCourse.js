@@ -8,12 +8,10 @@ import axios from 'axios';
 const URL = process.env.REACT_APP_BACKEND_URL;
 
 const TutorCourse = () => {
-    const [course, setCourse] = useState({_id: '', title: '', description: '', modules: [], certificate: null });
+    const [course, setCourse] = useState({_id: '', title: '', description: '', modules: [], certificate: { title: '', description: '' } });
     const [isCourseCreated, setIsCourseCreated] = useState(false);
     const [isCourseUpdated, setIsCourseUpdated] = useState(false);
     const [isShowForm, setIsShowForm] = useState(false);
-    const [certificate, setCertificate] = useState({ title: '', description: '' });
-    const [isCertificateFieldVisible, setIsCertificateFieldVisible] = useState(false);
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
     const [tutor, setTutor] = useState([]);
@@ -84,25 +82,16 @@ const TutorCourse = () => {
 
     const handleCertificateChange = (e) => {
         const { name, value } = e.target;
-        const updatedCertificate = {
-            ...certificate,
-            [name]: value
-        };
-        setCertificate(updatedCertificate);
         setCourse((prevCourse) => ({
             ...prevCourse,
-            certificate: updatedCertificate
+            certificate: {
+                ...prevCourse.certificate,
+                [name]: value
+            }
         }));
     };
+    
 
-    const toggleCertificateField = () => {
-        setIsCertificateFieldVisible((prevVisible) => !prevVisible);
-        if (isCertificateFieldVisible) {
-            // Reset certificate when hiding the fields
-            setCertificate({ title: '', description: '' });
-            setCourse((prevCourse) => ({ ...prevCourse, certificate: null }));
-        }
-    };
 
 
     const isObject = (value) => value && typeof value === "object" && !Array.isArray(value) && !(value instanceof File);
@@ -269,9 +258,7 @@ const TutorCourse = () => {
 
     const handleCancel = () => {
         setIsCourseCreated(false); // Hide form and submit button
-        setCourse({ title: '', description: '', modules: [], certificate: null }); // Reset the course state
-        setCertificate({ title: '', description: '' });
-        setIsCertificateFieldVisible(false);
+        setCourse({ title: '', description: '', modules: [], certificate: { title: '', description: '' } }); // Reset the course state
 
         setIsCourseUpdated(false);
         setIsShowForm(false);
@@ -311,38 +298,23 @@ const TutorCourse = () => {
 
                     {/* Certificate Section */}
                     <h3 className="text-lg font-semibold mb-2">Certificate</h3>
-                    {!isCertificateFieldVisible ? (
-                        <button
-                            onClick={toggleCertificateField}
-                            className="bg-blue-500 text-white px-3 py-1 rounded"
-                        >
-                            Add Certificate
-                        </button>
-                    ) : (
-                        <div>
-                            <input
-                                type="text"
-                                name="title"
-                                value={certificate.title}
-                                onChange={handleCertificateChange}
-                                placeholder="Certificate Title"
-                                className="mb-2 px-3 py-1 border rounded w-full"
-                            />
-                            <textarea
-                                name="description"
-                                value={certificate.description}
-                                onChange={handleCertificateChange}
-                                placeholder="Certificate Description"
-                                className="mb-2 px-3 py-1 border rounded w-full"
-                            />
-                            <button
-                                onClick={toggleCertificateField}
-                                className="bg-red-500 text-white px-3 py-1 rounded"
-                            >
-                                Remove Certificate
-                            </button>
-                        </div>
-                    )}
+                    <div>
+                        <input
+                            type="text"
+                            name="title"
+                            value={course?.certificate?.title || ''}
+                            onChange={handleCertificateChange}
+                            placeholder="Certificate Title"
+                            className="mb-2 px-3 py-1 border rounded w-full"
+                        />
+                        <textarea
+                            name="description"
+                            value={course?.certificate?.description || ''}
+                            onChange={handleCertificateChange}
+                            placeholder="Certificate Description"
+                            className="mb-2 px-3 py-1 border rounded w-full"
+                        />
+                    </div>
                 </div>
             )}
 

@@ -6,7 +6,8 @@ const CourseForm = ({ course, onCourseChange }) => {
         _id: course._id || '',
         title: course.title || '',
         description: course.description || '',
-        modules: course.modules || []
+        modules: course.modules || [],
+        certificate: course.certificate || { title: '', description: '' }
     });
 
     // Sync local state with the incoming course prop
@@ -15,7 +16,8 @@ const CourseForm = ({ course, onCourseChange }) => {
             _id: course._id || '',
             title: course.title || '',
             description: course.description || '',
-            modules: course.modules || []
+            modules: course.modules || [],
+            certificate: course.certificate || { title: '', description: '' }
         });
     }, [course]);
 
