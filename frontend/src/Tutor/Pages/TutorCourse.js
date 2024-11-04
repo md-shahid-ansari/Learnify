@@ -48,7 +48,7 @@ const TutorCourse = () => {
     
             if (response.data.success) {
                 setCourses(response.data.courses);
-                console.log(response.data.courses); // Log fetched courses
+                // console.log(response.data.courses); // Log fetched courses
             }
         } catch (error) {
             console.error("Error fetching courses:", error);
@@ -202,9 +202,6 @@ const TutorCourse = () => {
     };
 
     const handleUpdate = async () => {
-
-        console.log(course)
-
         if (!course.title || !course.description) { 
             showErrorToast("Please provide course title and description.");
             return;
@@ -276,7 +273,7 @@ const TutorCourse = () => {
         <div className="p-4">
             {/* Create Course Button */}
             <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-bold mb-4">Courses</h2>
+                <h2 className="text-2xl font-bold mb-4">Courses</h2>
                 {!isCourseCreated && !isCourseUpdated && (
                     <button 
                         onClick={handleAddCourse} 

@@ -35,7 +35,8 @@ import {
     uploadImage,
     getFile,
     deleteCourse,
-    updateCourse
+    updateCourse,
+    getAllCourses
 } from "../controllers/tutor.controller.js";
 
 
@@ -74,6 +75,9 @@ router.post("/fetch-courses", fetchCourses);
 router.get("/files/:fileId", getFile);
 router.post("/delete-course", deleteCourse);
 router.post("/update-course", updateCourse);
+
+
+router.post("/courses", getAllCourses);
 
 
 

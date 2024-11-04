@@ -519,3 +519,48 @@ export const updateCourse = async (req, res) => {
         res.status(500).json({ error: "An error occurred while updating the course." });
     }
 };
+
+
+export const getAllCourses = async (req, res) => {
+    try {
+        // Fetch courses with populated structure but without attempting to populate GridFS files
+        const courses = await Course.find().populate({
+            path: 'modules',
+            populate: [
+                {
+                    path: 'lessons',
+                    populate: { path: 'topics' }
+                },
+                { path: 'quizzes' }
+            ]
+        });
+
+        // Map through each course to attach image URLs
+        const coursesWithImages = await Promise.all(courses.map(async (course) => {
+            const modules = await Promise.all(course.modules.map(async (module) => {
+                const lessons = await Promise.all(module.lessons.map(async (lesson) => {
+                    const topics = await Promise.all(lesson.topics.map(async (topic) => {
+                        // Attach GridFS image URLs for each image in topic.images
+                        const imagesWithUrls = topic.images.map((image) => ({
+                            ...image.toObject(),
+                            previewUrl: getImageUrl(image.fileId)
+                        }));
+                        return { ...topic.toObject(), images: imagesWithUrls };
+                    }));
+                    return { ...lesson.toObject(), topics };
+                }));
+                return { ...module.toObject(), lessons };
+            }));
+            return { ...course.toObject(), modules };
+        }));
+
+        // Send the modified response with URLs included
+        res.status(200).json({
+            success: true,
+            courses: coursesWithImages,
+        });
+    } catch (error) {
+        console.error("Error fetching courses:", error);
+        res.status(500).json({ error: "An error occurred while fetching courses." });
+    }
+};
