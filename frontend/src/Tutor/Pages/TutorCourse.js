@@ -8,7 +8,7 @@ import axios from 'axios';
 const URL = process.env.REACT_APP_BACKEND_URL;
 
 const TutorCourse = () => {
-    const [course, setCourse] = useState({ title: '', description: '', modules: [], certificate: null });
+    const [course, setCourse] = useState({_id: '', title: '', description: '', modules: [], certificate: null });
     const [isCourseCreated, setIsCourseCreated] = useState(false);
     const [isCourseUpdated, setIsCourseUpdated] = useState(false);
     const [isShowForm, setIsShowForm] = useState(false);
@@ -111,6 +111,9 @@ const TutorCourse = () => {
         let emptyFields = [];
 
         for (let key in obj) {
+            // Skip the `_id` field
+            if (key === "_id") continue;
+
             const currentPath = path ? `${path}.${key}` : key;
 
             // Skip fields that are `File` objects without specific validation
@@ -210,9 +213,58 @@ const TutorCourse = () => {
     };
 
     const handleUpdate = async () => {
-        console.log(course);
-        handleCancel();
-    }
+
+        console.log(course)
+
+        if (!course.title || !course.description) { 
+            showErrorToast("Please provide course title and description.");
+            return;
+        }
+        
+        const emptyFields = findEmptyFields(course);
+        if (emptyFields.length > 0) {
+            showErrorToast(`Please fill out the following fields:\n- ${emptyFields.join("\n- ")}`);
+            return;
+        }
+    
+        try {
+            // Iterate through each image and upload if not uploaded already
+            for (let module of course.modules) {
+                for (let lesson of module.lessons) {
+                    for (let topic of lesson.topics) {
+                        for (let image of topic.images) {
+                            if (image.file) {
+                                const uploadedImage = await uploadImage(image.file);
+                                image.filename = uploadedImage.fileName;
+                                image.fileId = uploadedImage.fileId;
+                                delete image.file;
+                            }
+                        }
+                    }
+                }
+            }
+    
+            // Send the updated course data to backend
+            const response = await axios.post(`${URL}/api/auth/update-course`, {
+                course: course,
+                tutorId: tutor._id,
+            });
+    
+            if (response.data.success) {
+                showSuccessToast("Course updated successfully!");
+                fetchCourses(tutor._id);
+                handleCancel();
+            } else {
+                showErrorToast("Course update failed!");
+            }
+        } catch (err) {
+            if (err.response) {
+                showErrorToast(err.response.error || 'Something went wrong.');
+            } else {
+                showErrorToast('Server is not responding.');
+            }
+        }
+    };    
 
 
     const handleCancel = () => {

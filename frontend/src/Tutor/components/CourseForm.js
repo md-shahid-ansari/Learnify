@@ -3,6 +3,7 @@ import ModuleForm from './ModuleForm';  // Import the ModuleForm component
 
 const CourseForm = ({ course, onCourseChange }) => {
     const [courseData, setCourseData] = useState({
+        _id: course._id || '',
         title: course.title || '',
         description: course.description || '',
         modules: course.modules || []
@@ -11,6 +12,7 @@ const CourseForm = ({ course, onCourseChange }) => {
     // Sync local state with the incoming course prop
     useEffect(() => {
         setCourseData({
+            _id: course._id || '',
             title: course.title || '',
             description: course.description || '',
             modules: course.modules || []
@@ -26,7 +28,7 @@ const CourseForm = ({ course, onCourseChange }) => {
 
     // Add a new module
     const handleAddModule = () => {
-        const newModule = { title: '', description: '', lessons: [], quizzes: [] };
+        const newModule = {_id: '', title: '', description: '', lessons: [], quizzes: [] };
         const updatedModules = [...courseData.modules, newModule];
         handleInputChange("modules", updatedModules);
     };

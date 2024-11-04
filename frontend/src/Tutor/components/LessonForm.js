@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import TopicForm from './TopicForm'; // Import the TopicForm component
 
 const LessonForm = ({ index, lesson, onLessonChange, handleRemoveLesson }) => {
-    const [lessonData, setLessonData] = useState(lesson || { title: '', description: '', topics: [] });
+    const [lessonData, setLessonData] = useState(lesson || {_id: '', title: '', description: '', topics: [] });
 
     // Sync the local state with the incoming lesson prop
     useEffect(() => {
@@ -25,7 +25,7 @@ const LessonForm = ({ index, lesson, onLessonChange, handleRemoveLesson }) => {
 
     // Handle adding a new topic
     const handleAddTopic = () => {
-        const newTopic = { title: '', content: '', learningOutcomes: [] };
+        const newTopic = {_id: '', title: '', content: '', learningOutcomes: [] };
         const updatedTopics = [...(lessonData.topics || []), newTopic];
         const updatedLessonData = { ...lessonData, topics: updatedTopics };
 

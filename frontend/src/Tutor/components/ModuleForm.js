@@ -4,6 +4,7 @@ import QuizForm from './QuizForm'; // Import the QuizForm component
 
 const ModuleForm = ({ index, module, onModuleChange, handleRemoveModule }) => {
     const [moduleData, setModuleData] = useState({
+        _id: module._id || '',
         title: module.title || '',
         description: module.description || '',
         lessons: module.lessons || [],
@@ -13,6 +14,7 @@ const ModuleForm = ({ index, module, onModuleChange, handleRemoveModule }) => {
     // Sync the local state with the incoming module prop
     useEffect(() => {
         setModuleData({
+            _id: module._id,
             title: module.title || '',
             description: module.description || '',
             lessons: module.lessons || [],
@@ -21,7 +23,7 @@ const ModuleForm = ({ index, module, onModuleChange, handleRemoveModule }) => {
     }, [module]);
 
     const handleAddLesson = () => {
-        const newLesson = { title: '', description: '', topics: [] };
+        const newLesson = {_id: '', title: '', description: '', topics: [] };
         const updatedLessons = [...(moduleData.lessons || []), newLesson];
         const updatedModuleData = { ...moduleData, lessons: updatedLessons };
 
@@ -38,7 +40,7 @@ const ModuleForm = ({ index, module, onModuleChange, handleRemoveModule }) => {
     };
 
     const handleAddQuiz = () => {
-        const newQuiz = { title: '', questions: [] };
+        const newQuiz = {_id: '', title: '', questions: [] };
         const updatedQuizzes = [...(moduleData.quizzes || []), newQuiz];
         const updatedModuleData = { ...moduleData, quizzes: updatedQuizzes };
 

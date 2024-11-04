@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 const QuizForm = ({ index, quiz, onQuizChange, handleRemoveQuiz }) => {
     const [quizData, setQuizData] = useState(() => ({
+        _id: quiz._id || '',
         title: quiz.title || '',
         questions: quiz.questions || []
     }));
@@ -9,6 +10,7 @@ const QuizForm = ({ index, quiz, onQuizChange, handleRemoveQuiz }) => {
     // Sync the local state with the incoming quiz prop
     useEffect(() => {
         setQuizData({
+            _id: quiz._id || '',
             title: quiz.title || '',
             questions: quiz.questions || []
         });

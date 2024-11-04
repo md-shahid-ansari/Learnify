@@ -332,3 +332,165 @@ export const deleteCourse = async (req, res) => {
         res.status(500).json({ error: "An error occurred while deleting the course." });
     }
 };
+
+export const updateCourse = async (req, res) => {
+    const {course, tutorId } = req.body;
+    
+    if (!course || !course.title || !course.description) {
+        return res.status(400).json({ error: "Course ID, title, and description are required." });
+    }
+
+    try {
+        console.log(course._id)
+        // Find and update main course fields
+        const updatedCourse = await Course.findByIdAndUpdate(course._id, {
+            title: course.title,
+            description: course.description,
+            certificate: course.certificate,
+            tutor: tutorId,
+        }, { new: true });
+
+        if (!updatedCourse) {
+            return res.status(404).json({ error: "Course not found." });
+        }
+        console.log(updatedCourse)
+        // Loop through and update modules, lessons, topics, images, and quizzes
+        for (const moduleData of course.modules) {
+            let module;
+
+            // Update or create module
+            if (moduleData._id) {
+                module = await Module.findByIdAndUpdate(moduleData._id, {
+                    title: moduleData.title,
+                    description: moduleData.description,
+                }, { new: true });
+            } else {
+                module = new Module({
+                    title: moduleData.title,
+                    description: moduleData.description,
+                });
+                await module.save();
+                updatedCourse.modules.push(module._id);
+            }
+
+            // Process each lesson within the module
+            for (const lessonData of moduleData.lessons) {
+                let lesson;
+
+                // Update or create lesson
+                if (lessonData._id) {
+                    lesson = await Lesson.findByIdAndUpdate(lessonData._id, {
+                        title: lessonData.title,
+                        description: lessonData.description,
+                    }, { new: true });
+                } else {
+                    lesson = new Lesson({
+                        title: lessonData.title,
+                        description: lessonData.description,
+                    });
+                    await lesson.save();
+                    module.lessons.push(lesson._id);
+                }
+
+                // Process each topic within the lesson
+                for (const topicData of lessonData.topics) {
+                    let topic;
+
+                    // Update or create topic
+                    if (topicData._id) {
+                        topic = await Topic.findByIdAndUpdate(topicData._id, {
+                            title: topicData.title,
+                            content: topicData.content,
+                            learningOutcomes: topicData.learningOutcomes,
+                        }, { new: true });
+                    } else {
+                        topic = new Topic({
+                            title: topicData.title,
+                            content: topicData.content,
+                            learningOutcomes: topicData.learningOutcomes,
+                        });
+                        await topic.save();
+                        lesson.topics.push(topic._id);
+                    }
+
+                    // Update images and links for the topic
+                    topic.images = topicData.images.map(image => ({
+                        title: image.title,
+                        fileId: image.fileId,
+                        filename: image.filename,
+                    }));
+                    topic.links = topicData.links;
+
+                    await topic.save();
+                }
+
+                await lesson.save();
+            }
+
+            // Process quizzes within the module
+            for (const quizData of moduleData.quizzes) {
+                let quiz;
+
+                if (quizData._id) {
+                    // Update existing quiz
+                    quiz = await Quiz.findById(quizData._id);
+
+                    // Update quiz title
+                    quiz.title = quizData.title;
+
+                    // Update or add questions
+                    quiz.questions = quizData.questions.map(questionData => {
+                        if (questionData._id) {
+                            // Find and update existing question
+                            const existingQuestion = quiz.questions.id(questionData._id);
+                            if (existingQuestion) {
+                                existingQuestion.questionText = questionData.questionText;
+                                existingQuestion.questionType = questionData.questionType;
+                                existingQuestion.options = questionData.options;
+                                existingQuestion.correctAnswer = questionData.correctAnswer;
+                                return existingQuestion;
+                            }
+                        }
+                        // Create new question if `_id` is not found
+                        return {
+                            questionText: questionData.questionText,
+                            questionType: questionData.questionType,
+                            options: questionData.options,
+                            correctAnswer: questionData.correctAnswer,
+                        };
+                    });
+
+                    await quiz.save();
+                } else {
+                    // Create new quiz if no `_id` is provided
+                    quiz = new Quiz({
+                        title: quizData.title,
+                        questions: quizData.questions.map(question => ({
+                            questionText: question.questionText,
+                            questionType: question.questionType,
+                            options: question.options,
+                            correctAnswer: question.correctAnswer,
+                        })),
+                    });
+                    await quiz.save();
+                    module.quizzes.push(quiz._id);
+                }
+            }
+
+            await module.save();
+        }
+
+        // Save the course document with all updates
+        await updatedCourse.save();
+
+        // Send success response
+        res.status(200).json({
+            success: true,
+            message: "Course updated successfully!",
+            course: updatedCourse,
+        });
+    } catch (error) {
+        console.error("Error updating course:", error);
+        res.status(500).json({ error: "An error occurred while updating the course." });
+    }
+};

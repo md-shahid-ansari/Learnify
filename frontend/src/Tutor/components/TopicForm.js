@@ -3,6 +3,7 @@ import { nanoid } from 'nanoid';
 
 const TopicForm = ({ index, topic, onTopicChange, handleRemoveTopic }) => {
     const [topicData, setTopicData] = useState({
+        _id: '',
         title: '',
         content: '',
         learningOutcomes: [],
@@ -45,7 +46,7 @@ const TopicForm = ({ index, topic, onTopicChange, handleRemoveTopic }) => {
     };
 
     const handleAddImage = () => {
-        const newImage = { id: nanoid(), title: '', file: null, previewUrl: null };
+        const newImage = {id: nanoid(), title: '', file: null, previewUrl: null };
         updateTopicData({
             ...topicData,
             images: [...(topicData.images || []), newImage]
@@ -53,14 +54,14 @@ const TopicForm = ({ index, topic, onTopicChange, handleRemoveTopic }) => {
     };
 
     const handleRemoveImage = (imageId) => {
-        const updatedImages = (topicData.images || []).filter((image) => image.id !== imageId);
+        const updatedImages = (topicData.images || []).filter((image) => image._id !== imageId);
         updateTopicData({ ...topicData, images: updatedImages });
     };
 
     const handleImageChange = (imageId, field, value) => {
         setTopicData((prevTopicData) => {
             const updatedImages = (prevTopicData.images || []).map((image) => 
-                image.id === imageId
+                image._id === imageId
                     ? {
                           ...image,
                           [field]: value,
@@ -88,13 +89,13 @@ const TopicForm = ({ index, topic, onTopicChange, handleRemoveTopic }) => {
     };
 
     const handleRemovelink = (linkId) => {
-        const updatedLinks = (topicData.links || []).filter((link) => link.id !== linkId);
+        const updatedLinks = (topicData.links || []).filter((link) => link._id !== linkId);
         updateTopicData({ ...topicData, links: updatedLinks });
     };
 
     const handleLinkChange = (linkId, field, value) => {
         const updatedLinks = (topicData.links || []).map((link) =>
-            link.id === linkId ? { ...link, [field]: value } : link
+            link._id === linkId ? { ...link, [field]: value } : link
         );
         updateTopicData({ ...topicData, links: updatedLinks });
     };
@@ -167,31 +168,31 @@ const TopicForm = ({ index, topic, onTopicChange, handleRemoveTopic }) => {
             <div className="mb-4">
                 <h6 className="text-md font-semibold">Images</h6>
                 {(topicData.images || []).map((image) => (
-                    <div key={image.id} className="mb-4">
+                    <div key={image._id} className="mb-4">
                         <div className="flex items-center mb-2">
                             <input
                                 type="text"
                                 value={image.title}
-                                onChange={(e) => handleImageChange(image.id, 'title', e.target.value)}
+                                onChange={(e) => handleImageChange(image._id, 'title', e.target.value)}
                                 placeholder={`Image Title`}
                                 className="w-full mr-2 p-2 border border-gray-300 rounded"
                             />
                             <button
                                 type="button"
-                                onClick={() => handleRemoveImage(image.id)}
+                                onClick={() => handleRemoveImage(image._id)}
                                 className="mt-2 px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600"
                                 aria-label={`Remove Image`}
                             >
                                 ×
                             </button>
                             <input
-                                id={`file-input-${image.id}`}
+                                id={`file-input-${image._id}`}
                                 type="file"
-                                onChange={(e) => handleImageChange(image.id, 'file', e.target.files[0])}
+                                onChange={(e) => handleImageChange(image._id, 'file', e.target.files[0])}
                                 className="hidden"
                             />
                         </div>
-                        <div onClick={() => handleImageClick(image.id)} className="cursor-pointer w-full">
+                        <div onClick={() => handleImageClick(image._id)} className="cursor-pointer w-full">
                             {image.previewUrl ? (
                                 <img
                                     src={image.previewUrl}
@@ -219,24 +220,24 @@ const TopicForm = ({ index, topic, onTopicChange, handleRemoveTopic }) => {
             <div>
                 <h6 className="text-md font-semibold">Links</h6>
                 {(topicData.links || []).map((link) => (
-                    <div key={link.id} className="flex items-center mb-2">
+                    <div key={link._id} className="flex items-center mb-2">
                         <input
                             type="text"
                             value={link.title}
-                            onChange={(e) => handleLinkChange(link.id, 'title', e.target.value)}
+                            onChange={(e) => handleLinkChange(link._id, 'title', e.target.value)}
                             placeholder="Link Title"
                             className="mr-2 w-full p-2 border border-gray-300 rounded"
                         />
                         <input
                             type="text"
                             value={link.url}
-                            onChange={(e) => handleLinkChange(link.id, 'url', e.target.value)}
+                            onChange={(e) => handleLinkChange(link._id, 'url', e.target.value)}
                             placeholder="Link URL"
                             className="mr-2 w-full p-2 border border-gray-300 rounded"
                         />
                         <button
                             type="button"
-                            onClick={() => handleRemovelink(link.id)}
+                            onClick={() => handleRemovelink(link._id)}
                             className="mt-2 px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600"
                             aria-label={`Remove link`}
                         >
