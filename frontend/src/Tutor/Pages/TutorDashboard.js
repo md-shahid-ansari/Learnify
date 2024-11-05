@@ -85,7 +85,7 @@ const TutorDashboard = () => {
 
                         {/* Edit/View Button - add functionality as needed */}
                         <div className="flex space-x-4 mt-2">
-                            <button className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">
+                            <button className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600" onClick={() => navigate("/tutor-home/tutor-course-view", { state: { course } })}>
                                 View Course
                             </button>
                         </div>

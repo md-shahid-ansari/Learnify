@@ -1,0 +1,21 @@
+// TutorCourseViewer.js
+import React from 'react';
+import { useLocation } from 'react-router-dom';
+import CourseViewer from '../components/CourseViewer';
+
+const TutorCourseViewer = () => {
+    const location = useLocation();
+    const { course } = location.state || {};
+
+    return (
+        <div className="bg-gray-100 min-h-screen p-8">
+            {course ? (
+                <CourseViewer course={course} />
+            ) : (
+                <p className="text-gray-700 text-center">No course data available</p>
+            )}
+        </div>
+    );
+};
+
+export default TutorCourseViewer;

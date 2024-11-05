@@ -30,6 +30,7 @@ import TutorResetPage from './Auth/TutorResetPage';
 import Courses from './HomePage/Components/Courses';
 
 import axios from 'axios';
+import TutorCourseViewer from './Tutor/Pages/TutorCourseViewer';
 
 axios.defaults.withCredentials = true;
 
@@ -65,6 +66,7 @@ const App = () => {
             <Route path="tutor-dashboard" element={<TutorDashboard />} />
             <Route path="tutor-course" element={<TutorCourse />} />
             <Route path="tutor-profile" element={<TutorProfileSettings />} />
+            <Route path="tutor-course-view" element={<TutorCourseViewer/>} />
           </Route>
 
           <Route path="/admin-home" element={<AdminHome />}>

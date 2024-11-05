@@ -408,7 +408,7 @@ const TutorCourse = () => {
                             }}>
                                 Edit Course
                             </button>
-                            <button className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">
+                            <button className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600" onClick={() => navigate("/tutor-home/tutor-course-view", { state: { course } })}>
                                 View Course
                             </button>
                             <button className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600" onClick={() => deleteCourse(course._id)}>
