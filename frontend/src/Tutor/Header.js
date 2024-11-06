@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { showErrorToast } from '../Toast/toasts';
 
-const URL = process.env.REACT_APP_BACKEND_URL; // Replace with your actual backend URL
+const URL = process.env.REACT_APP_BACKEND_URL;
 
 function Header() {
   const navigate = useNavigate();
@@ -34,10 +34,9 @@ function Header() {
   };
 
   return (
-    <header className="flex justify-between items-center p-4 bg-gray-800 text-white">
+    <header className="fixed top-0 w-full flex justify-between items-center p-4 bg-gray-800 text-white z-10">
       <div className="mr-1 text-3xl font-bold">Learnify</div>
       <div className="flex items-center space-x-1">
-        {/* Search Input with Icon */}
         <div className="flex items-center border border-gray-300 rounded-lg p-2 bg-blue-200 max-w-xs">
           <i className="fas fa-search text-gray-500 text-xl ml-2"></i>
           <input
@@ -47,7 +46,6 @@ function Header() {
           />
         </div>
 
-        {/* Navigation Links */}
         <Link
           to="/tutor-home/tutor-dashboard"
           className="bg-blue-200 hover:bg-blue-300 text-white font-semibold py-2 px-4 rounded"

@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 
 function Header() {
   return (
-    <header className="flex justify-between items-center p-4 bg-gray-800 text-white">
+    <header className="fixed top-0 w-full flex justify-between items-center p-4 bg-gray-800 text-white">
       <div className="mr-1 text-2xl font-bold">Learnify</div>
       <div className="flex items-center space-x-2">
         {/* Search Input with Icon */}
