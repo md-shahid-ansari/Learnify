@@ -154,39 +154,6 @@ export const createCourse = async (req, res) => {
 };
 
 
-// export const fetchCourses = async (req, res) => {
-//     const { tutorId } = req.body;
-
-//     // Validate input
-//     if (!tutorId) {
-//         return res.status(400).json({ error: "Tutor ID is required." });
-//     }
-
-//     try {
-//         // Fetch all courses with the specified tutorId
-//         const courses = await Course.find({ tutor: tutorId }).populate({
-//             path: 'modules',
-//             populate: [
-//                 {
-//                     path: 'lessons',
-//                     populate: { path: 'topics' }
-//                 },
-//                 { path: 'quizzes' }
-//             ]
-//         });
-
-//         // Return the courses in the response
-//         res.status(200).json({
-//             success: true,
-//             courses,
-//         });
-//     } catch (error) {
-//         console.error("Error fetching courses:", error);
-//         res.status(500).json({ error: "An error occurred while fetching courses." });
-//     }
-// };
-
-
 export const getFile = async (req, res) => {
     const { fileId } = req.params;
 
@@ -564,3 +531,4 @@ export const getAllCourses = async (req, res) => {
         res.status(500).json({ error: "An error occurred while fetching courses." });
     }
 };
+
