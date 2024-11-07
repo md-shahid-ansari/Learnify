@@ -150,19 +150,28 @@ const CourseContent = ({ content, handleNavigation }) => {
                                 <div key={question._id} className="p-4 bg-gray-100 rounded-md shadow">
                                     <p className="font-semibold">{index + 1}. {question.questionText}</p>
                                     {question.questionType === 'multiple-choice' && (
-                                        <ul className="list-disc list-inside mt-2">
+                                        <div className="mt-2 space-y-2">
                                             {question.options.map((option, idx) => (
-                                                <li key={idx}>{option}</li>
+                                                <label key={idx} className="flex items-center space-x-2">
+                                                    <input
+                                                        type="radio"
+                                                        name={`question-${question._id}`} // Ensures only one option can be selected per question
+                                                        value={option}
+                                                        className="form-radio text-blue-600"
+                                                    />
+                                                    <span>{option}</span>
+                                                </label>
                                             ))}
-                                        </ul>
+                                        </div>
                                     )}
+
                                     {question.questionType === 'short-answer' && (
                                         <textarea
                                             placeholder="Your answer"
                                             className="w-full mt-2 p-2 border rounded"
                                         ></textarea>
                                     )}
-                                    {question.questionType === 'true-false' && (
+                                    {question.questionType === 'true/false' && (
                                         <div className="mt-2">
                                             <label className="mr-4">
                                                 <input type="radio" name={`question-${index}`} value="true" className="mr-2" />
@@ -293,7 +302,7 @@ const CourseViewer = ({ course }) => {
     }, []);
 
     return (
-        <div className="pt-16 h-screen flex mb-20">
+        <div className="pt-16 h-screen flex mb-16">
             {/* Sidebar */}
             <CourseSidebar
                 course={course}

@@ -20,18 +20,6 @@ const TutorProfileSettings = () => {
         }));
     };
 
-    const handleProfilePictureChange = (e) => {
-        const file = e.target.files[0];
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            setTutor((prevTutor) => ({
-                ...prevTutor,
-                profilePicture: reader.result,
-            }));
-        };
-        reader.readAsDataURL(file);
-    };
-
     const handleSubmit = (e) => {
         e.preventDefault();
         console.log(tutor);
@@ -42,21 +30,7 @@ const TutorProfileSettings = () => {
         <div className="flex flex-col items-center py-8 px-4 bg-gray-100 min-h-screen">
             <h1 className="text-2xl font-bold mb-6">Tutor Profile Settings</h1>
             <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-md w-full max-w-md">
-                
-                {/* Profile Picture */}
-                <div className="mb-4">
-                    <label htmlFor="profilePicture" className="block text-sm font-medium text-gray-700">Profile Picture</label>
-                    <div className="flex items-center my-2">
-                        {tutor.profilePicture && <img src={tutor.profilePicture} alt="Profile" className="w-16 h-16 rounded-full" />}
-                    </div>
-                    <input 
-                        type="file" 
-                        id="profilePicture" 
-                        onChange={handleProfilePictureChange} 
-                        accept="image/*"
-                        className="mt-2 text-sm"
-                    />
-                </div>
+            
 
                 {/* Full Name */}
                 <div className="mb-4">
