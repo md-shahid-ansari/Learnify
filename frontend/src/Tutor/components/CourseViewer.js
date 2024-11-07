@@ -4,36 +4,39 @@ const CourseSidebar = ({ course, onLessonSelect, onQuizSelect, isOpen }) => (
     <div
         className={`fixed top-16 left-0 h-[calc(100vh-4rem)] w-64 transform ${
             isOpen ? 'translate-x-0' : '-translate-x-full'
-        } bg-gray-800 text-white p-4 space-y-4 transition-transform duration-300 overflow-y-auto z-20`}
+        } bg-gray-800 text-white p-4 space-y-4 transition-transform duration-300 overflow-y-auto z-20 thin-scrollbar`}
     >
         <h2 className="text-xl font-bold mb-2">{course.title}</h2>
-        <p className="text-gray-300 mb-4">{course.description}</p>
         {course.modules.map((module) => (
-            <div key={module._id} className="mb-4">
-                <h3 className="text-lg font-semibold text-gray-200">{module.title}</h3>
-                <p className="text-gray-400 text-sm mb-2">{module.description}</p>
-                <div className="space-y-2">
-                    <button className="w-full text-left bg-gray-700 p-2 rounded">Lessons</button>
-                    <ul className="space-y-1">
+            <div 
+                key={module._id} 
+                className="mb-4 p-4 bg-gray-700 rounded-lg shadow-md"
+            >
+                <h3 className="text-lg font-semibold text-gray-200 mb-2">{module.title}</h3>
+
+                <div className="bg-gray-600 p-2 rounded-lg mb-4">
+                    <button className="w-full text-left text-gray-200 font-medium">Lessons</button>
+                    <ul className="space-y-1 mt-2">
                         {module.lessons.map((lesson, index) => (
                             <li
                                 key={lesson._id}
                                 onClick={() => onLessonSelect(module, index)}
-                                className="cursor-pointer hover:bg-gray-600 p-1 rounded"
+                                className="cursor-pointer hover:bg-gray-500 p-2 rounded-md"
                             >
                                 {lesson.title}
                             </li>
                         ))}
                     </ul>
                 </div>
-                <div className="mt-2 space-y-2">
-                    <button className="w-full text-left bg-gray-700 p-2 rounded">Quizzes</button>
-                    <ul className="space-y-1">
+
+                <div className="bg-gray-600 p-2 rounded-lg">
+                    <button className="w-full text-left text-gray-200 font-medium">Quizzes</button>
+                    <ul className="space-y-1 mt-2">
                         {module.quizzes.map((quiz, index) => (
                             <li
                                 key={quiz._id}
                                 onClick={() => onQuizSelect(module, index)}
-                                className="cursor-pointer hover:bg-gray-600 p-1 rounded"
+                                className="cursor-pointer hover:bg-gray-500 p-2 rounded-md"
                             >
                                 {quiz.title}
                             </li>
