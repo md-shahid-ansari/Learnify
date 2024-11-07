@@ -36,7 +36,9 @@ import {
     getFile,
     deleteCourse,
     updateCourse,
-    getAllCourses
+    getAllCourses,
+
+    updateTutor
 } from "../controllers/tutor.controller.js";
 
 
@@ -78,6 +80,8 @@ router.post("/update-course", updateCourse);
 
 
 router.post("/courses", getAllCourses);
+
+router.post("/tutor-update", updateTutor);
 
 
 

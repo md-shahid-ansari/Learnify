@@ -184,7 +184,7 @@ const RegistrationPage = () => {
             </div>
             {formData.role === 'Student' && (
               <div className="form-group">
-                <label className="block text-sm font-medium">Skills (for students)</label>
+                <label className="block text-sm font-medium">Skills</label>
                 <input
                   type="text"
                   name="skills"
@@ -197,7 +197,7 @@ const RegistrationPage = () => {
             )}
             {formData.role === 'Tutor' && (
               <div className="form-group">
-                <label className="block text-sm font-medium">Short Bio (for mentors)</label>
+                <label className="block text-sm font-medium">Short Bio</label>
                 <textarea
                   name="bio"
                   placeholder="Tell us about yourself"

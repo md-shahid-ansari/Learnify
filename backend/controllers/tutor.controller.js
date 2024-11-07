@@ -3,6 +3,7 @@ import {Module} from '../models/module.model.js';
 import {Lesson} from '../models/lesson.model.js';
 import {Quiz} from '../models/quiz.model.js';
 import {Topic} from '../models/topic.model.js';
+import {Tutor} from '../models/tutor.model.js';
 
 import multer from 'multer';
 import { bucket } from '../db/connectDb.js'; // Import the GridFS instance
@@ -532,3 +533,45 @@ export const getAllCourses = async (req, res) => {
     }
 };
 
+
+export const updateTutor = async (req, res) => {
+    const { _id, email, name, bio } = req.body;
+    console.log( _id, email, name, bio )
+    // Validate request body
+    if (!_id || !email || !name || !bio) {
+        return res.status(400).json({
+            success: false,
+            message: 'All fields (_id, email, name, bio) are required.',
+        });
+    }
+
+    try {
+        // Find and update the tutor record
+        const updatedTutor = await Tutor.findByIdAndUpdate(
+            _id,
+            { email, name, bio },
+            { new: true } // Return the updated document
+        );
+
+        if (!updatedTutor) {
+            return res.status(404).json({
+                success: false,
+                message: 'Tutor not found. Update failed.',
+            });
+        }
+
+        // Send success response
+        return res.status(200).json({
+            success: true,
+            message: 'Profile updated successfully.',
+            tutor: updatedTutor,
+        });
+    } catch (error) {
+        // Log and send error response
+        console.error('Error updating tutor profile:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'Internal server error. Could not update profile.',
+        });
+    }
+};
