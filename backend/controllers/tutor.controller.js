@@ -536,7 +536,7 @@ export const getAllCourses = async (req, res) => {
 
 export const updateTutor = async (req, res) => {
     const { _id, email, name, bio } = req.body;
-    console.log( _id, email, name, bio )
+    
     // Validate request body
     if (!_id || !email || !name || !bio) {
         return res.status(400).json({

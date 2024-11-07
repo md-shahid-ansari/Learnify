@@ -21,8 +21,8 @@ const adminSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    constactNumber: {
-        type: Number,
+    contactNumber: {
+        type: String,
         required: true,
     },
     dateCreated: {
@@ -32,11 +32,6 @@ const adminSchema = new mongoose.Schema({
     isVerified: {
         type: Boolean,
         default: false
-    },
-    role: {
-        type: String,
-        enum: ['superadmin', 'admin', 'moderator'],
-        default: 'admin'
     },
     lastLogin: {
         type: Date,

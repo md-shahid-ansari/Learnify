@@ -1,140 +1,172 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { IsStudentSessionLive } from '../utils/IsStudentSessionLive';
+import { useNavigate } from 'react-router-dom';
+import { showErrorToast, showSuccessToast } from '../../Toast/toasts';
+import axios from 'axios';
 
-const useFetchStudentData = () => {
-    const [student, setStudent] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                await new Promise((resolve) => setTimeout(resolve, 1000));
-                const mockData = {
-                    name: 'John Doe',
-                    email: 'john.doe@example.com',
-                    profilePicture: 'https://via.placeholder.com/150',
-                    contact: '+1234567890'
-                };
-                setStudent(mockData);
-            } catch (err) {
-                setError('Failed to fetch student data');
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchData();
-    }, []);
-
-    return { student, loading, error };
-};
+const URL = process.env.REACT_APP_BACKEND_URL;
 
 const StudentProfileSettings = () => {
-    const { student, loading, error } = useFetchStudentData();
-    const [name, setName] = useState('');
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [profilePicture, setProfilePicture] = useState('');
-    const [contact, setContact] = useState('');
+    const [student, setStudent] = useState({
+        _id: '',
+        name: 'Jane Doe',
+        email: 'jane.doe@example.com',
+        skills: 'Enthusiastic student eager to learn and grow.',
+    });
+    const [loading, setLoading] = useState(true);
+    const [loadingForgot, setLoadingForgot] = useState(false);
+    const [loadingUpdate, setLoadingUpdate] = useState(false);
+    const navigate = useNavigate();
 
     useEffect(() => {
-        if (student) {
-            setName(student.name);
-            setEmail(student.email);
-            setProfilePicture(student.profilePicture);
-            setContact(student.contact);
-        }
-    }, [student]);
+        const authenticate = async () => {
+            const { isAuthenticated, studentData } = await IsStudentSessionLive();
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        console.log({
-            name,
-            email,
-            password,
-            profilePicture,
-            contact,
-        });
-        alert('Profile updated successfully');
-    };
-
-    const handleProfilePictureChange = (e) => {
-        const file = e.target.files[0];
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            setProfilePicture(reader.result);
+            if (!isAuthenticated) {
+                showErrorToast('You are not authenticated. Please log in again.');
+                navigate('/login-page');
+                setLoading(false);
+                return;
+            }
+            if (studentData) {
+                setStudent(studentData);
+            }
+            setLoading(false);
         };
-        reader.readAsDataURL(file);
+
+        authenticate();
+    }, [navigate]);
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setStudent((prevStudent) => ({
+            ...prevStudent,
+            [name]: value,
+        }));
     };
 
-    if (loading) return <div className="text-center mt-10">Loading...</div>;
-    if (error) return <div className="text-red-500 text-center mt-10">{error}</div>;
+    const handlePasswordResetRequest = async () => {
+        setLoadingForgot(true);
+        try {
+            const response = await axios.post(`${URL}/api/auth/student-forgot`, {
+                email: student.email
+            });
+
+            if (!response.data.success) {
+                showErrorToast(response.data.message || 'Reset link failed to send.');
+            } else {
+                showSuccessToast(response.data.message || 'Reset link sent successfully.');
+            }
+        } catch (err) {
+            if (err.response) {
+                showErrorToast(err.response.data.message || 'Something went wrong.');
+            } else {
+                showErrorToast('Server is not responding.');
+            }
+        } finally {
+            setLoadingForgot(false);
+        }
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoadingUpdate(true);
+
+        try {
+            const response = await axios.post(`${URL}/api/auth/student-update`, {
+                _id: student._id,
+                email: student.email,
+                name: student.name,
+                skills: student.skills
+            });
+
+            if (!response.data.success) {
+                showErrorToast(response.data.message || 'Profile update failed.');
+            } else {
+                showSuccessToast(response.data.message || 'Profile updated successfully.');
+            }
+        } catch (err) {
+            if (err.response) {
+                showErrorToast(err.response.data.message || 'Something went wrong.');
+            } else {
+                showErrorToast('Server is not responding.');
+            }
+        } finally {
+            setLoadingUpdate(false);
+        }
+    };
+
+    if (loading) 
+        return (
+            <p className="text-center text-indigo-500 text-xl font-semibold animate-pulse mt-10">
+                Loading...
+            </p>
+        );
 
     return (
-        <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-lg mt-10">
-            <h1 className="text-2xl font-bold text-center text-gray-800 mb-6">Profile Settings</h1>
-            <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="flex flex-col items-center">
-                    <img
-                        src={profilePicture}
-                        alt="Profile"
-                        className="w-24 h-24 rounded-full border-2 border-gray-300"
-                    />
-                    <input
-                        type="file"
-                        onChange={handleProfilePictureChange}
-                        accept="image/*"
-                        className="mt-2 text-sm text-gray-600"
-                    />
-                </div>
-
-                <div>
-                    <label className="block text-gray-700">Full Name</label>
-                    <input
-                        type="text"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        required
-                        className="w-full p-2 mt-1 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        <div className="flex flex-col items-center py-12 px-6 bg-gray-50 min-h-screen">
+            <h1 className="text-2xl font-bold text-gray-800 mb-8">Student Profile Settings</h1>
+            <form onSubmit={handleSubmit} className="w-full max-w-md bg-white p-8 rounded-lg shadow-lg">
+                
+                {/* Full Name */}
+                <div className="mb-6">
+                    <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                    <input 
+                        type="text" 
+                        id="name" 
+                        name="name"
+                        value={student.name} 
+                        onChange={handleChange} 
+                        required 
+                        className="p-2 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                     />
                 </div>
 
-                <div>
-                    <label className="block text-gray-700">Email</label>
-                    <input
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                        className="w-full p-2 mt-1 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                {/* Email (Unchangeable) */}
+                <div className="mb-6">
+                    <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        name="email"
+                        value={student.email} 
+                        disabled 
+                        className="p-2 w-full rounded-md border-gray-300 shadow-sm bg-gray-100 focus:outline-none"
                     />
                 </div>
 
-                <div>
-                    <label className="block text-gray-700">New Password</label>
-                    <input
-                        type="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className="w-full p-2 mt-1 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                {/* Password Reset Button */}
+                <div className="mb-6">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                    <button 
+                        type="button"
+                        onClick={handlePasswordResetRequest}
+                        className="w-full py-2 bg-indigo-600 text-white rounded-md shadow-md hover:bg-indigo-700 focus:outline-none"
+                    >
+                        {loadingForgot ? 'Sending reset link...' : 'Send Password Reset Link'}
+                    </button>
+                </div>
+
+                {/* skills */}
+                <div className="mb-6">
+                    <label htmlFor="skills" className="block text-sm font-medium text-gray-700 mb-2">Skills</label>
+                    <textarea
+                        id="skills"
+                        name="skills"
+                        value={student.skills}
+                        onChange={handleChange}
+                        rows="4"
+                        placeholder="Write skills comma saparated!"
+                        className="p-2 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                     />
                 </div>
 
-                <div>
-                    <label className="block text-gray-700">Contact Number</label>
-                    <input
-                        type="tel"
-                        value={contact}
-                        onChange={(e) => setContact(e.target.value)}
-                        required
-                        className="w-full p-2 mt-1 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    />
-                </div>
-
-                <button
-                    type="submit"
-                    className="w-full py-2 mt-4 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
+                {/* Save Changes */}
+                <button 
+                    type="submit" 
+                    className="w-full py-2 bg-indigo-600 text-white rounded-md shadow-md hover:bg-indigo-700 focus:outline-none"
                 >
-                    Save Changes
+                    {loadingUpdate ? 'Saving...' : 'Save Changes'}
                 </button>
             </form>
         </div>

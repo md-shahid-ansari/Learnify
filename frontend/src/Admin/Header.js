@@ -66,6 +66,12 @@ function Header() {
           <i className="fas fa-book text-xl" title="Manage Courses"></i>
         </Link>
         <Link
+          to="/admin-home/admin-profile"
+          className="bg-blue-200 hover:bg-blue-300 text-white font-semibold py-2 px-4 rounded"
+        >
+          <i className="fas fa-user text-xl" title="Profile"></i>
+        </Link>
+        <Link
           onClick={logout}
           disabled={loadingLogout}
           className="bg-blue-200 hover:bg-blue-300 text-white font-semibold py-2 px-4 rounded"

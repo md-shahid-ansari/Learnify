@@ -21,22 +21,9 @@ const studentSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    profilePicture: {
-        type: String,
-        default: null  // URL for the user’s profile picture
-    },
     skills: {
         type: [String],  // List of skills for the student
         default: []
-    },
-    bio: {
-        type: String,
-        default: null  // Short biography about the student
-    },
-    experienceLevel: {
-        type: String,
-        enum: ['beginner', 'intermediate', 'expert'],
-        default: 'beginner'
     },
     dateJoined: {
         type: Date,
