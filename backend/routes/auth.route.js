@@ -40,7 +40,10 @@ import {
 
     updateTutor
 } from "../controllers/tutor.controller.js";
-import { updateStudent } from "../controllers/student.controller.js";
+import { 
+    updateStudent,
+    enroll
+ } from "../controllers/student.controller.js";
 import { updateAdmin } from "../controllers/admin.controller.js";
 
 
@@ -86,6 +89,8 @@ router.post("/courses", getAllCourses);
 router.post("/tutor-update", updateTutor);
 router.post("/student-update", updateStudent);
 router.post("/admin-update", updateAdmin);
+
+router.post("/enroll", enroll);
 
 
 
