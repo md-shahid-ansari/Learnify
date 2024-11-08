@@ -2,6 +2,7 @@ import {Student} from '../models/student.model.js';
 import {Course} from '../models/course.model.js';
 import {Enrollment} from '../models/enrollment.model.js';
 
+
 export const updateStudent = async (req, res) => {
     const { _id, email, name, skills } = req.body;
     // Validate request body
@@ -108,4 +109,84 @@ export const enroll = async (req, res) => {
       });
     }
 };
-  
+
+
+export const getEnrollments = async (req, res) => {
+  const { studentId } = req.body;
+
+  // Validate input
+  if (!studentId) {
+    return res.status(400).json({ error: "Student ID is required." });
+  }
+
+  try {
+    // Fetch enrollments with selective population (excluding large GridFS files if applicable)
+    const enrollments = await Enrollment.find({ studentId })
+    .populate('courseId');
+
+    // Send response
+    res.status(200).json({
+      success: true,
+      enrollments,
+    });
+  } catch (error) {
+    console.error("Error fetching enrollments:", error);
+    res.status(500).json({ error: "An error occurred while fetching enrollments." });
+  }
+}
+
+
+// Helper function to generate URLs for GridFS images
+const URL = process.env.REACT_APP_BACKEND_URL;
+const getImageUrl = (fileId) => `${URL}/api/auth/files/${fileId}`;
+
+export const getCourse = async (req, res) => {
+    const { courseId } = req.body;
+
+    // Validate input
+    if (!courseId) {
+        return res.status(400).json({ error: "course Id is required." });
+    }
+
+    try {
+        // Fetch courses with populated structure but without attempting to populate GridFS files
+        const courses = await Course.find({ _id: courseId }).populate({
+            path: 'modules',
+            populate: [
+                {
+                    path: 'lessons',
+                    populate: { path: 'topics' }
+                },
+                { path: 'quizzes' }
+            ]
+        });
+
+        // Map through each course to attach image URLs
+        const coursesWithImages = await Promise.all(courses.map(async (course) => {
+            const modules = await Promise.all(course.modules.map(async (module) => {
+                const lessons = await Promise.all(module.lessons.map(async (lesson) => {
+                    const topics = await Promise.all(lesson.topics.map(async (topic) => {
+                        // Attach GridFS image URLs for each image in topic.images
+                        const imagesWithUrls = topic.images.map((image) => ({
+                            ...image.toObject(),
+                            previewUrl: getImageUrl(image.fileId)
+                        }));
+                        return { ...topic.toObject(), images: imagesWithUrls };
+                    }));
+                    return { ...lesson.toObject(), topics };
+                }));
+                return { ...module.toObject(), lessons };
+            }));
+            return { ...course.toObject(), modules };
+        }));
+
+        // Send the modified response with URLs included
+        res.status(200).json({
+            success: true,
+            course: coursesWithImages,
+        });
+    } catch (error) {
+        console.error("Error fetching course:", error);
+        res.status(500).json({ error: "An error occurred while fetching course." });
+    }
+};

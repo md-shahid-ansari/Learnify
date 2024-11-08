@@ -31,6 +31,7 @@ import Courses from './HomePage/Components/Courses';
 
 import axios from 'axios';
 import TutorCourseViewer from './Tutor/Pages/TutorCourseViewer';
+import StudentCourseViewer from './Student/Pages/StudentCourseViewer';
 
 axios.defaults.withCredentials = true;
 
@@ -58,6 +59,7 @@ const App = () => {
             <Route path="student-course" element={<StudentCourse />} />
             <Route path="student-certificate" element={<StudentCertificate />} />
             <Route path="student-profile" element={<StudentProfileSettings />} />
+            <Route path="student-course-view" element={<StudentCourseViewer/>} />
           </Route>
 
           <Route path="/tutor-home" element={<TutorHome />}>

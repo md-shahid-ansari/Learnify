@@ -1,82 +1,96 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { IsStudentSessionLive } from '../utils/IsStudentSessionLive';
+import { useNavigate } from 'react-router-dom';
+import { showErrorToast} from '../../Toast/toasts';
+import axios from 'axios';
+
+const URL = process.env.REACT_APP_BACKEND_URL;
 
 const StudentCourse = () => {
-    const [learningPath, setLearningPath] = useState({
-        pathTitle: '',
-        description: '',
-        modules: [],
-        certifications: []
-    });
+    const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
+    const [enrollments, setEnrollments] = useState([]);
 
     useEffect(() => {
-        const fetchLearningPath = async () => {
-            try {
-                const response = {
-                    pathTitle: "Full Stack Development",
-                    description: "A comprehensive learning path to master Full Stack Development.",
-                    modules: [
-                        { id: 1, title: "HTML & CSS Basics", progress: "Completed" },
-                        { id: 2, title: "JavaScript Fundamentals", progress: "In Progress" },
-                        { id: 3, title: "React and Redux", progress: "Not Started" }
-                    ],
-                    certifications: [
-                        { title: "Front-End Developer Certification", description: "Earn a certification by mastering front-end skills.", link: "https://frontend-certification.com" },
-                        { title: "Full-Stack Developer Certification", description: "Become a certified Full Stack Developer.", link: "https://fullstack-certification.com" }
-                    ]
-                };
-                await new Promise((resolve) => setTimeout(resolve, 1000));
-                setLearningPath(response);
-            } catch (error) {
-                console.error('Error fetching learning path data:', error);
-            }
-        };
+        const authenticate = async () => {
+            const { isAuthenticated, studentData} = await IsStudentSessionLive();
 
-        fetchLearningPath();
-    }, []);
+            if (!isAuthenticated) {
+                showErrorToast('You are not authenticated. Please log in again.');
+                navigate('/login-page');
+                setLoading(false);
+                return;
+            }
+            fetchEnrollments(studentData._id);
+            setLoading(false);
+        };
+    
+        authenticate();
+    }, [navigate]); // Only depend on navigate
+    
+    const fetchEnrollments = async (studentId) => {
+        try {
+            const response = await axios.post(`${URL}/api/auth/enrollments`,{
+                studentId
+            });
+    
+            if (response.data.success) {
+                setEnrollments(response.data.enrollments);
+                console.log(response.data.enrollments)
+            }            
+        } catch (error) {
+            console.error("Error fetching enrollments:", error);
+        }
+    };
+
+    // Return loading spinner or error message as needed
+    if (loading) 
+        return (
+        <p className="text-center text-blue-500 text-xl font-semibold animate-pulse mt-10">
+            Loading...
+        </p>
+        );
 
     return (
-        <div className="max-w-4xl mx-auto p-6 bg-gray-100 rounded-lg shadow-md mt-10">
-            <header className="text-center mb-8">
-                <h1 className="text-3xl font-bold text-gray-800">{learningPath.pathTitle}</h1>
-                <p className="text-gray-600 mt-2">{learningPath.description}</p>
-            </header>
+        <div className="p-6 space-y-6">
+        {enrollments.map((enrollment) => (
+            <div key={enrollment._id} className="p-6 border border-gray-300 rounded-lg shadow-md">
+            {/* Course Title and Description */}
+            <h2 className="text-2xl font-bold mb-2">{enrollment.courseId.title}</h2>
+            <p className="text-gray-700 mb-4">{enrollment.courseId.description}</p>
 
-            {/* Modules Section */}
-            <section className="mb-10">
-                <h2 className="text-2xl font-semibold text-gray-700 mb-4">Modules</h2>
-                <ul className="space-y-4">
-                    {learningPath.modules.map((module) => (
-                        <li key={module.id} className="p-4 bg-white rounded-lg shadow-md flex justify-between items-center">
-                            <div>
-                                <h3 className="text-xl font-semibold text-gray-800">{module.title}</h3>
-                                <p className="text-gray-500">Status: {module.progress}</p>
-                            </div>
-                            {module.progress !== 'Completed' && (
-                                <Link to={`/module/${module.id}`} className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition duration-300">
-                                    Next Module
-                                </Link>
-                            )}
-                        </li>
-                    ))}
-                </ul>
-            </section>
+            {/* Certificate Information */}
+            {enrollment.courseId.certificate && (
+                <div className="bg-gray-100 p-4 rounded-md mt-4">
+                <h4 className="text-xl font-semibold">Certificate: {enrollment.courseId.certificate.title}</h4>
+                <p className="text-gray-600">{enrollment.courseId.certificate.description}</p>
+                </div>
+            )}
 
-            {/* Recommended Certifications Section */}
-            <section>
-                <h2 className="text-2xl font-semibold text-gray-700 mb-4">Recommended Certifications</h2>
-                <ul className="space-y-4">
-                    {learningPath.certifications.map((cert, index) => (
-                        <li key={index} className="p-4 bg-white rounded-lg shadow-md">
-                            <h3 className="text-xl font-semibold text-gray-800">{cert.title}</h3>
-                            <p className="text-gray-500">{cert.description}</p>
-                            <a href={cert.link} target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:text-indigo-800 transition duration-300 mt-2 inline-block">
-                                Learn More
-                            </a>
-                        </li>
-                    ))}
-                </ul>
-            </section>
+            {/* Progress */}
+            <div className="mt-4">
+            <p className="text-gray-600 mb-2">Progress: {enrollment.progress}%</p>
+
+            <div className="w-full bg-gray-200 rounded-full h-2">
+                <div
+                className="bg-blue-500 h-2 rounded-full"
+                style={{ width: `${enrollment.progress}%` }}
+                ></div>
+            </div>
+            </div>
+
+
+            {/* Edit/View Button */}
+            <div className="flex space-x-4 mt-2">
+                <button
+                className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+                onClick={() => navigate("/student-home/student-course-view", { state: { enrollment } })}
+                >
+                Read
+                </button>
+            </div>
+            </div>
+        ))}
         </div>
     );
 };

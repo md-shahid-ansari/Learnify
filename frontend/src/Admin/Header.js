@@ -33,7 +33,7 @@ function Header() {
   };
 
   return (
-    <header className="fixed top-0 w-full flex justify-between items-center p-4 bg-gray-800 text-white">
+    <header className="fixed top-0 w-full flex justify-between items-center p-4 bg-gray-800 text-white  z-10">
       <div className="mr-1 text-2xl font-bold">Learnify</div>
       <div className="flex items-center space-x-1">
         {/* Search Input with Icon */}

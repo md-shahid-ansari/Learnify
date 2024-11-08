@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react';
 
 // CourseSidebar Component
-const CourseSidebar = ({ course, onSelectStep, isOpen }) => (
+const CourseSidebar = ({ course,enrollment, onSelectStep, isOpen }) => (
     <div
         className={`fixed top-16 left-0 h-[calc(100vh-4rem)] w-64 transform ${
             isOpen ? 'translate-x-0' : '-translate-x-full'
         } bg-gray-800 text-white p-4 space-y-4 transition-transform duration-300 overflow-y-auto z-20 thin-scrollbar`}
     >
         <h2 className="text-xl font-bold mb-4">{course.title}</h2>
+        <ProgressBar
+            enrollment={enrollment}
+        />
         {course.modules.map((module, moduleIdx) => (
             <div key={module._id} className="mb-4">
                 <h3 className="text-lg font-semibold text-gray-200 mb-2">{module.title}</h3>
@@ -80,7 +83,7 @@ const TopicImage = ({ src, alt, title }) => {
 
 
 // CourseContent Component
-const CourseContent = ({ content, handleNavigation }) => {
+const CourseContent = ({ content}) => {
     const renderContent = () => {
         if (!content) {
             return <p className="text-gray-500">Select a step to begin.</p>;
@@ -200,9 +203,24 @@ const CourseContent = ({ content, handleNavigation }) => {
     );
 };
 
+const ProgressBar = ({ enrollment }) => {
+    return (
+      <div className="">
+        <p className="text-gray-100 mb-2">Progress: {enrollment.progress}%</p>
+  
+        <div className="w-full bg-gray-200 rounded-full h-2">
+          <div
+            className="bg-blue-500 h-2 rounded-full"
+            style={{ width: `${enrollment.progress}%` }}
+          ></div>
+        </div>
+      </div>
+    );
+  };
+
 
 // CourseViewer Component
-const CourseViewer = ({ course }) => {
+const CourseViewer = ({ course , enrollment}) => {
     const [isSidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 730);
     const [steps, setSteps] = useState([]);
     const [currentStepIndex, setCurrentStepIndex] = useState(0);
@@ -306,6 +324,7 @@ const CourseViewer = ({ course }) => {
             {/* Sidebar */}
             <CourseSidebar
                 course={course}
+                enrollment={enrollment}
                 onSelectStep={handleSelectStep}
                 isOpen={isSidebarOpen}
             />
@@ -322,7 +341,6 @@ const CourseViewer = ({ course }) => {
             <main className={`flex-1 transition-all duration-300 ${isSidebarOpen ? 'ml-64' : 'ml-0'}`}>
                 <CourseContent
                     content={selectedContent}
-                    handleNavigation={handleNavigation}
                 />
                 {/* Navigation Buttons */}
                 <div className="flex justify-between p-6">

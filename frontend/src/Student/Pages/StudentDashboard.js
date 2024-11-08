@@ -54,9 +54,16 @@ const StudentDashboard = () => {
             if (response.data.success) {
                 showSuccessToast("Enrolled Successfully!")
                 navigate('/student-home/student-course');
+            } else {
+                showErrorToast(response.data.message);
             }
-        } catch (error) {
-            showErrorToast("Error fetching courses:", error);
+        } catch (error){
+            console.log("Error enrolling course:", error)
+            if(!error.response.data.success){
+                showErrorToast(error.response.data.message);
+            } else {
+                showErrorToast("Error enrolling course:", error);
+            }
         }
     }
 

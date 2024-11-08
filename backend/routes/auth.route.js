@@ -42,7 +42,9 @@ import {
 } from "../controllers/tutor.controller.js";
 import { 
     updateStudent,
-    enroll
+    enroll,
+    getEnrollments,
+    getCourse
  } from "../controllers/student.controller.js";
 import { updateAdmin } from "../controllers/admin.controller.js";
 
@@ -91,6 +93,8 @@ router.post("/student-update", updateStudent);
 router.post("/admin-update", updateAdmin);
 
 router.post("/enroll", enroll);
+router.post("/course", getCourse);
+router.post("/enrollments", getEnrollments);
 
 
 
