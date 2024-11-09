@@ -295,6 +295,7 @@ const CourseViewer = ({ course , currEnrollment}) => {
             const totalLessons = course.modules.reduce((sum, module) => sum + module.lessons.length, 0);
             const totalQuizzes = course.modules.reduce((sum, module) => sum + module.quizzes.length, 0);
             setTotalLessonAndQuiz(totalLessons + totalQuizzes);
+            refreshEnrollment();
         };
 
         initializeSteps();
@@ -313,8 +314,9 @@ const CourseViewer = ({ course , currEnrollment}) => {
                 const response = await axios.post(`${URL}/api/auth/get-enrollment`, {
                     enrollmentId: enrollment._id
                 });
-                if(response.data.message){
+                if(response.data.success){
                     setEnrollment(response.data.enrollment)
+                    // console.log(response.data.enrollment)
                 }
             } catch (err) {
                 if (err.response) {
@@ -374,12 +376,10 @@ const CourseViewer = ({ course , currEnrollment}) => {
         }
         if (direction === 'next' && currentStepIndex < steps.length - 1) {
             setCurrentStepIndex(currentStepIndex + 1);
-            refreshEnrollment();
         } else if (direction === 'previous' && currentStepIndex > 0) {
             setCurrentStepIndex(currentStepIndex - 1);
         } else {
             setCompleted(true);
-            refreshEnrollment();
         }
     };
 
@@ -391,6 +391,8 @@ const CourseViewer = ({ course , currEnrollment}) => {
                     enrollmentId: enrollment._id,
                     totalLessonAndQuiz: totalLessonAndQuiz
                 });
+                
+                refreshEnrollment();
                 return response.data.success
             } catch (err) {
                 if (err.response) {

@@ -271,4 +271,4 @@ export const getEnrollment = async (req, res) => {
       console.error("Error fetching enrollment:", error);
       res.status(500).json({ error: "An error occurred while fetching enrollment." });
     }
-  }
+};
