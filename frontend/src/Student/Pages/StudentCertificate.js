@@ -1,52 +1,103 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { IsStudentSessionLive } from '../utils/IsStudentSessionLive';
+import { useNavigate } from 'react-router-dom';
+import { showErrorToast } from '../../Toast/toasts';
+import axios from 'axios';
+
+const URL = process.env.REACT_APP_BACKEND_URL;
 
 const StudentCertificate = () => {
+    const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
     const [certificates, setCertificates] = useState([]);
 
-    // Simulate fetching certificates from an API
     useEffect(() => {
-        const fetchCertificates = async () => {
-            const exampleCertificates = [
-                {
-                    title: "Front-End Developer Certification",
-                    description: "Certification awarded for mastering front-end development skills, including HTML, CSS, and JavaScript.",
-                    date: "July 2023",
-                    issuedBy: "FreeCodeCamp",
-                },
-                {
-                    title: "Full-Stack Developer Certification",
-                    description: "Recognition for completing full-stack development training, covering both front-end and back-end skills.",
-                    date: "September 2023",
-                    issuedBy: "Coursera",
-                },
-                {
-                    title: "React Advanced Concepts",
-                    description: "Certificate awarded for expertise in React, Redux, and component-based architecture.",
-                    date: "October 2023",
-                    issuedBy: "Udemy",
-                },
-            ];
+        const authenticate = async () => {
+            const { isAuthenticated, studentData } = await IsStudentSessionLive();
 
-            await new Promise((resolve) => setTimeout(resolve, 1000));
-            setCertificates(exampleCertificates);
+            if (!isAuthenticated) {
+                showErrorToast('You are not authenticated. Please log in again.');
+                navigate('/login-page');
+                setLoading(false);
+                return;
+            }
+            fetchCertificates(studentData._id);
+            setLoading(false);
         };
 
-        fetchCertificates();
-    }, []);
+        authenticate();
+    }, [navigate]);
+
+    const fetchCertificates = async (studentId) => {
+        try {
+            const response = await axios.post(`${URL}/api/auth/certificates`, { studentId });
+
+            if (response.data.success) {
+                setCertificates(response.data.certificates);
+                console.log(response.data.certificates);
+            }
+        } catch (error) {
+            console.error("Error fetching certificates:", error);
+        }
+    };
+
+    if (loading)
+        return (
+            <p className="text-center text-blue-500 text-xl font-semibold animate-pulse mt-10">
+                Loading...
+            </p>
+        );
 
     return (
-        <div className="max-w-4xl mx-auto p-6 bg-gray-100 rounded-lg shadow-md mt-10">
-            <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">Certificates</h1>
-            <div className="space-y-6">
-                {certificates.map((certificate, index) => (
-                    <div key={index} className="p-4 bg-white rounded-lg shadow-md border border-gray-200">
-                        <h2 className="text-xl font-semibold text-gray-700">{certificate.title}</h2>
-                        <p className="text-gray-500 mt-2">{certificate.description}</p>
-                        <div className="flex justify-between items-center mt-4">
-                            <span className="text-sm text-gray-600">Issued By: {certificate.issuedBy}</span>
-                            <span className="text-sm text-gray-600">Date: {certificate.date}</span>
-                        </div>
+        <div className="w-full p-8 bg-gray-100">
+            <h1 className="text-2xl font-bold text-gray-800 mb-10">Certificates</h1>
+            <div>
+                {certificates.map((certificate) => (
+                    <div
+                    key={certificate._id}
+                    className="relative p-8 bg-white rounded-xl shadow-xl border border-gray-200 overflow-hidden w-full h-[calc(100vh)] aspect-video"
+                >
+                    {/* Colorful Decorative Background with Gradient and Animation */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 opacity-60 pointer-events-none rounded-xl animate-pulse"></div>
+                
+                    {/* Inner Border with Soft Glow */}
+                    <div className="absolute inset-0 rounded-xl border-4 border-purple-600 opacity-80 blur-xl"></div>
+                
+                    {/* Light Pattern Overlay */}
+                    <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-transparent via-white/50 to-transparent opacity-50 pointer-events-none"></div>
+                
+                    {/* Certificate Title and Description */}
+                    <div className="relative text-center mb-12">
+                        <h2 className="text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-pink-600 to-blue-500 uppercase tracking-wider">
+                            {certificate.title}
+                        </h2>
+                        <p className="text-lg text-gray-500 mt-4">{certificate.description}</p>
                     </div>
+                
+                    {/* Course Information with Elegant Card-like Design */}
+                    <div className="mt-8 text-gray-700">
+                        <p className="text-xl font-semibold text-gray-800">
+                            <strong>Course:</strong> {certificate.course.title}
+                        </p>
+                    </div>
+                
+                    {/* Tutor and Issued to Information */}
+                    <div className="relative flex justify-between items-center mt-8 text-gray-700">
+                        <p className="text-md font-medium">
+                            <strong>Tutor:</strong> {certificate.tutor.name}
+                        </p>
+                        <p className="text-md font-medium">
+                            <strong>Issued to:</strong> {certificate.earnedBy.name}
+                        </p>
+                    </div>
+                
+                    {/* Date Earned with Soft Gradient Accent */}
+                    <div className="relative text-center mt-6 text-gray-700">
+                        <p className="text-md font-medium"><strong>Date Earned:</strong> {new Date(certificate.dateEarned).toLocaleDateString()}</p>
+                    </div>
+                
+                </div>
+                
                 ))}
             </div>
         </div>

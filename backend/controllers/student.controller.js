@@ -340,3 +340,29 @@ export const issueCertificate = async (enrollment) => {
     }
 };
 
+
+export const getCertificates = async (req, res) => {
+    const { studentId } = req.body;
+  
+    // Validate input
+    if (!studentId) {
+      return res.status(400).json({ error: "Student ID is required." });
+    }
+  
+    try {
+      // Fetch certificates with selective field population
+      const certificates = await Certificate.find({ earnedBy: studentId })
+        .populate('course', 'title')  // Only populate necessary fields
+        .populate('earnedBy', 'name')             // Example: student's name only
+        .populate('tutor', 'name');               // Example: tutor's name only
+  
+      // Send response
+      res.status(200).json({
+        success: true,
+        certificates,
+      });
+    } catch (error) {
+      console.error(`Error fetching certificates for student ${studentId}:`, error);
+      res.status(500).json({ error: "An error occurred while fetching certificates." });
+    }
+};
