@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 // CourseSidebar Component
-const CourseSidebar = ({ course,enrollment, onSelectStep, isOpen }) => (
+const CourseSidebar = ({ course, enrollment, onSelectStep, isOpen }) => (
     <div
         className={`fixed top-16 left-0 h-[calc(100vh-4rem)] w-64 transform ${
             isOpen ? 'translate-x-0' : '-translate-x-full'
@@ -29,7 +29,8 @@ const CourseSidebar = ({ course,enrollment, onSelectStep, isOpen }) => (
                             <li
                                 key={lesson._id}
                                 onClick={() => onSelectStep({ type: 'lesson', moduleIdx, lessonIdx })}
-                                className="cursor-pointer hover:bg-gray-500 p-2 rounded-md"
+                                className={`cursor-pointer p-2 rounded-md hover:bg-gray-500 
+                                    ${enrollment.completedLessons.includes(lesson._id) ? "text-green-600 font-semibold" : ""}`}
                             >
                                 {lesson.title}
                             </li>
@@ -43,7 +44,8 @@ const CourseSidebar = ({ course,enrollment, onSelectStep, isOpen }) => (
                             <li
                                 key={quiz._id}
                                 onClick={() => onSelectStep({ type: 'quiz', moduleIdx, quizIdx })}
-                                className="cursor-pointer hover:bg-gray-500 p-2 rounded-md"
+                                className={`cursor-pointer p-2 rounded-md hover:bg-gray-500 
+                                    ${enrollment.completedQuizzes.includes(quiz._id) ? "text-green-600 font-semibold" : ""}`}
                             >
                                 {quiz.title}
                             </li>
@@ -83,7 +85,7 @@ const TopicImage = ({ src, alt, title }) => {
 
 
 // CourseContent Component
-const CourseContent = ({ content}) => {
+const CourseContent = ({ content , isShowAnsers , handleSubmitAnswers}) => {
     const renderContent = () => {
         if (!content) {
             return <p className="text-gray-500">Select a step to begin.</p>;
@@ -165,14 +167,36 @@ const CourseContent = ({ content}) => {
                                                     <span>{option}</span>
                                                 </label>
                                             ))}
+                                            {isShowAnsers && (
+                                                <div className="w-full mt-4 p-3 bg-green-50 border border-green-300 rounded-lg shadow-sm">
+                                                    <label className="text-sm font-medium text-green-700">
+                                                        Correct Answer: 
+                                                    </label>
+                                                    <span className="ml-2 text-green-800 font-semibold">
+                                                        {question.correctAnswer}
+                                                    </span>
+                                                </div>
+                                            )}
                                         </div>
                                     )}
 
                                     {question.questionType === 'short-answer' && (
-                                        <textarea
-                                            placeholder="Your answer"
-                                            className="w-full mt-2 p-2 border rounded"
-                                        ></textarea>
+                                        <>
+                                            <textarea
+                                                placeholder="Your answer"
+                                                className="w-full mt-2 p-2 border rounded"
+                                            ></textarea>
+                                            {isShowAnsers && (
+                                                <div className="w-full mt-4 p-3 bg-green-50 border border-green-300 rounded-lg shadow-sm">
+                                                    <label className="text-sm font-medium text-green-700">
+                                                        Correct Answer: 
+                                                    </label>
+                                                    <span className="ml-2 text-green-800 font-semibold">
+                                                        {question.correctAnswer}
+                                                    </span>
+                                                </div>
+                                            )}
+                                        </>
                                     )}
                                     {question.questionType === 'true/false' && (
                                         <div className="mt-2">
@@ -184,10 +208,27 @@ const CourseContent = ({ content}) => {
                                                 <input type="radio" name={`question-${index}`} value="false" className="mr-2" />
                                                 False
                                             </label>
+                                            {isShowAnsers && (
+                                                <div className="w-full mt-4 p-3 bg-green-50 border border-green-300 rounded-lg shadow-sm">
+                                                    <label className="text-sm font-medium text-green-700">
+                                                        Correct Answer: 
+                                                    </label>
+                                                    <span className="ml-2 text-green-800 font-semibold">
+                                                        {question.correctAnswer}
+                                                    </span>
+                                                </div>
+                                            )}
                                         </div>
                                     )}
                                 </div>
                             ))}
+                            <button
+                                onClick={handleSubmitAnswers}
+                                className={`bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 ${isShowAnsers ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                disabled={isShowAnsers}
+                            >
+                                Submit Answers
+                            </button>
                         </div>
                     </div>
                 );
@@ -225,6 +266,8 @@ const CourseViewer = ({ course , enrollment}) => {
     const [steps, setSteps] = useState([]);
     const [currentStepIndex, setCurrentStepIndex] = useState(0);
     const [selectedContent, setSelectedContent] = useState(null);
+    const [isShowAnsers, setIsShowAnswers] = useState(false);
+    const [completed, setCompleted] = useState(false);
 
     useEffect(() => {
         // Initialize steps
@@ -272,6 +315,7 @@ const CourseViewer = ({ course , enrollment}) => {
             case 'lesson':
                 const lesson = course.modules[step.moduleIdx].lessons[step.lessonIdx];
                 return {
+                    _id: lesson._id,
                     type: 'lesson',
                     title: lesson.title,
                     description: lesson.description,
@@ -280,6 +324,7 @@ const CourseViewer = ({ course , enrollment}) => {
             case 'quiz':
                 const quiz = course.modules[step.moduleIdx].quizzes[step.quizIdx];
                 return {
+                    _id: quiz._id,
                     type: 'quiz',
                     title: quiz.title,
                     questions: quiz.questions,
@@ -290,12 +335,29 @@ const CourseViewer = ({ course , enrollment}) => {
     };
 
     const handleNavigation = (direction) => {
+        setIsShowAnswers(false);
+        const lessonOrQuiz = getContentByStep(steps[currentStepIndex]);
+        if (lessonOrQuiz.type === 'lesson' || lessonOrQuiz.type === 'quiz'){
+            handleNext(lessonOrQuiz);
+        }
         if (direction === 'next' && currentStepIndex < steps.length - 1) {
             setCurrentStepIndex(currentStepIndex + 1);
         } else if (direction === 'previous' && currentStepIndex > 0) {
             setCurrentStepIndex(currentStepIndex - 1);
+        } else {
+            setCompleted(true);
         }
     };
+
+    const handleNext = (lessonOrQuiz) => {
+        console.log(lessonOrQuiz);
+    }
+
+    const handleSubmitAnswers = () => {
+        setIsShowAnswers(true);
+        const quiz = getContentByStep(steps[currentStepIndex]);
+        console.log(quiz);
+    }
 
     const handleSelectStep = (step) => {
         const index = steps.findIndex(
@@ -341,6 +403,8 @@ const CourseViewer = ({ course , enrollment}) => {
             <main className={`flex-1 transition-all duration-300 ${isSidebarOpen ? 'ml-64' : 'ml-0'}`}>
                 <CourseContent
                     content={selectedContent}
+                    isShowAnsers={isShowAnsers}
+                    handleSubmitAnswers={handleSubmitAnswers}
                 />
                 {/* Navigation Buttons */}
                 <div className="flex justify-between p-6">
@@ -353,10 +417,10 @@ const CourseViewer = ({ course , enrollment}) => {
                     </button>
                     <button
                         onClick={() => handleNavigation('next')}
-                        className={`bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 ${currentStepIndex === steps.length - 1 ? 'opacity-50 cursor-not-allowed' : ''}`}
-                        disabled={currentStepIndex === steps.length - 1}
+                        className={`bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 ${completed ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        disabled={completed}
                     >
-                        Next
+                        {currentStepIndex === steps.length - 1 ? "Complete" : "Next"}
                     </button>
                 </div>
             </main>

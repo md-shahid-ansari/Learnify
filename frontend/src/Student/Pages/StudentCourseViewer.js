@@ -18,7 +18,7 @@ const StudentCourseViewer = () => {
 
             if (response.data.success) {
                 setCourse(response.data.course);
-                console.log(response.data.course);  // Log extracted course data
+                // console.log(response.data.course);  // Log extracted course data
             }
         } catch (error) {
             console.error("Error fetching courses:", error);

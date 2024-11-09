@@ -36,7 +36,7 @@ const StudentCourse = () => {
     
             if (response.data.success) {
                 setEnrollments(response.data.enrollments);
-                console.log(response.data.enrollments)
+                // console.log(response.data.enrollments)
             }            
         } catch (error) {
             console.error("Error fetching enrollments:", error);
