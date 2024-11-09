@@ -36,7 +36,7 @@ const StudentCourseViewer = () => {
             {course ? (
                 <CourseViewer 
                     course={course[0]} 
-                    enrollment={enrollment}
+                    currEnrollment={enrollment}
                 />
             ) : (
                 <p className="text-gray-700 text-center">No course data available</p>

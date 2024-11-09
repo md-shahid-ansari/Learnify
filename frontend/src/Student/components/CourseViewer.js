@@ -1,4 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import {showErrorToast, showSuccessToast} from '../../Toast/toasts'
+
+const URL = process.env.REACT_APP_BACKEND_URL;
+
 
 // CourseSidebar Component
 const CourseSidebar = ({ course, enrollment, onSelectStep, isOpen }) => (
@@ -261,13 +266,15 @@ const ProgressBar = ({ enrollment }) => {
 
 
 // CourseViewer Component
-const CourseViewer = ({ course , enrollment}) => {
+const CourseViewer = ({ course , currEnrollment}) => {
     const [isSidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 730);
     const [steps, setSteps] = useState([]);
     const [currentStepIndex, setCurrentStepIndex] = useState(0);
     const [selectedContent, setSelectedContent] = useState(null);
     const [isShowAnsers, setIsShowAnswers] = useState(false);
     const [completed, setCompleted] = useState(false);
+    const [totalLessonAndQuiz, setTotalLessonAndQuiz] = useState(0);
+    const [enrollment, setEnrollment] = useState(currEnrollment);
 
     useEffect(() => {
         // Initialize steps
@@ -284,6 +291,10 @@ const CourseViewer = ({ course , enrollment}) => {
                 ]),
             ];
             setSteps(stepsArray);
+            // Calculate the total number of lessons and quizzes
+            const totalLessons = course.modules.reduce((sum, module) => sum + module.lessons.length, 0);
+            const totalQuizzes = course.modules.reduce((sum, module) => sum + module.quizzes.length, 0);
+            setTotalLessonAndQuiz(totalLessons + totalQuizzes);
         };
 
         initializeSteps();
@@ -295,6 +306,25 @@ const CourseViewer = ({ course , enrollment}) => {
             setSelectedContent(getContentByStep(steps[currentStepIndex]));
         }
     }, [steps, currentStepIndex]);
+
+    const refreshEnrollment = async() => {
+        if(enrollment._id){
+            try {
+                const response = await axios.post(`${URL}/api/auth/get-enrollment`, {
+                    enrollmentId: enrollment._id
+                });
+                if(response.data.message){
+                    setEnrollment(response.data.enrollment)
+                }
+            } catch (err) {
+                if (err.response) {
+                    showErrorToast(err.response.data.message || 'Something went wrong.');
+                } else {
+                    showErrorToast('Server is not responding.');
+                }
+            }
+        }
+    }
 
     const getContentByStep = (step) => {
         switch (step.type) {
@@ -338,25 +368,65 @@ const CourseViewer = ({ course , enrollment}) => {
         setIsShowAnswers(false);
         const lessonOrQuiz = getContentByStep(steps[currentStepIndex]);
         if (lessonOrQuiz.type === 'lesson' || lessonOrQuiz.type === 'quiz'){
-            handleNext(lessonOrQuiz);
+            if(!handleNext(lessonOrQuiz)){
+                return;
+            }
         }
         if (direction === 'next' && currentStepIndex < steps.length - 1) {
             setCurrentStepIndex(currentStepIndex + 1);
+            refreshEnrollment();
         } else if (direction === 'previous' && currentStepIndex > 0) {
             setCurrentStepIndex(currentStepIndex - 1);
         } else {
             setCompleted(true);
+            refreshEnrollment();
         }
     };
 
-    const handleNext = (lessonOrQuiz) => {
-        console.log(lessonOrQuiz);
+    const handleNext = async (lessonOrQuiz) => {
+        if(!enrollment.completedLessons.includes(lessonOrQuiz._id) && lessonOrQuiz.type === 'lesson'){
+            try {
+                const response = await axios.post(`${URL}/api/auth/add-lesson`, {
+                    lessonId: lessonOrQuiz._id,
+                    enrollmentId: enrollment._id,
+                    totalLessonAndQuiz: totalLessonAndQuiz
+                });
+                return response.data.success
+            } catch (err) {
+                if (err.response) {
+                    showErrorToast(err.response.data.message || 'Something went wrong.');
+                } else {
+                    showErrorToast('Server is not responding.');
+                }
+            }
+        } else if(lessonOrQuiz.type === 'quiz') {
+            return true;
+        }
     }
 
-    const handleSubmitAnswers = () => {
-        setIsShowAnswers(true);
+    const handleSubmitAnswers = async () => {
         const quiz = getContentByStep(steps[currentStepIndex]);
-        console.log(quiz);
+        if (!enrollment.completedQuizzes.includes(quiz._id)){
+            try {
+                const response = await axios.post(`${URL}/api/auth/add-quiz`, {
+                    quizId: quiz._id,
+                    enrollmentId: enrollment._id,
+                    totalLessonAndQuiz: totalLessonAndQuiz
+                });
+                setIsShowAnswers(true);
+                showSuccessToast(response.data.message);
+                refreshEnrollment();
+            } catch (err) {
+                if (err.response) {
+                    showErrorToast(err.response.data.message || 'Something went wrong.');
+                } else {
+                    showErrorToast('Server is not responding.');
+                }
+            }
+        } else {
+            setIsShowAnswers(true);
+            showSuccessToast("Quiz Already Completed!")
+        }
     }
 
     const handleSelectStep = (step) => {

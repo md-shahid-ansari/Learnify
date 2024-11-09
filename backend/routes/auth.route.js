@@ -44,7 +44,10 @@ import {
     updateStudent,
     enroll,
     getEnrollments,
-    getCourse
+    getEnrollment,
+    getCourse,
+    addLesson,
+    addQuiz
  } from "../controllers/student.controller.js";
 import { updateAdmin } from "../controllers/admin.controller.js";
 
@@ -95,6 +98,9 @@ router.post("/admin-update", updateAdmin);
 router.post("/enroll", enroll);
 router.post("/course", getCourse);
 router.post("/enrollments", getEnrollments);
+router.post("/add-lesson", addLesson);
+router.post("/add-quiz", addQuiz);
+router.post("/get-enrollment", getEnrollment);
 
 
 

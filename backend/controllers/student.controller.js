@@ -190,3 +190,85 @@ export const getCourse = async (req, res) => {
         res.status(500).json({ error: "An error occurred while fetching course." });
     }
 };
+
+
+
+// Add lesson to completedLessons
+export const addLesson = async (req, res) => {
+    const { lessonId, enrollmentId , totalLessonAndQuiz } = req.body;
+
+    try {
+        // Find enrollment by ID
+        const enrollment = await Enrollment.findById(enrollmentId);
+
+        // Check if the lesson is already in completedLessons
+        if (!enrollment.completedLessons.includes(lessonId)) {
+            enrollment.completedLessons.push(lessonId);
+            enrollment.progress = calculateProgress(enrollment , totalLessonAndQuiz); // Update progress
+            await enrollment.save();
+
+            return res.status(200).json({ success: true, message: "Lesson marked as completed", enrollment });
+        } else {
+            return res.status(200).json({ success: true, message: "Lesson already completed" });
+        }
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ success: false, message: "Server error" });
+    }
+};
+
+// Add quiz to completedQuizzes
+export const addQuiz = async (req, res) => {
+    const { quizId, enrollmentId , totalLessonAndQuiz } = req.body;
+
+    try {
+        // Find enrollment by ID
+        const enrollment = await Enrollment.findById(enrollmentId);
+
+        // Check if the quiz is already in completedQuizzes
+        if (!enrollment.completedQuizzes.includes(quizId)) {
+            enrollment.completedQuizzes.push(quizId);
+            enrollment.progress = calculateProgress(enrollment, totalLessonAndQuiz); // Update progress
+            await enrollment.save();
+
+            return res.status(200).json({ success: true, message: "Quiz marked as completed", enrollment });
+        } else {
+            return res.status(200).json({ success: true, message: "Quiz already completed" });
+        }
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ success: false, message: "Server error" });
+    }
+};
+
+// Helper function to calculate course progress based on completed lessons and quizzes
+const calculateProgress = (enrollment , totalLessonAndQuiz) => {
+    const totalItems = enrollment.completedLessons.length + enrollment.completedQuizzes.length; // Adjust if needed
+    const progress = (totalItems / totalLessonAndQuiz) * 100;
+    return Math.min(progress, 100); // Ensure progress doesn't exceed 100%
+};
+
+
+export const getEnrollment = async (req, res) => {
+    const { enrollmentId } = req.body;
+  
+    // Validate input
+    if (!enrollmentId) {
+      return res.status(400).json({ error: "enrollment ID is required." });
+    }
+  
+    try {
+      // Fetch enrollments with selective population (excluding large GridFS files if applicable)
+      const enrollment = await Enrollment.findById(enrollmentId)
+      .populate('courseId');
+  
+      // Send response
+      res.status(200).json({
+        success: true,
+        enrollment,
+      });
+    } catch (error) {
+      console.error("Error fetching enrollment:", error);
+      res.status(500).json({ error: "An error occurred while fetching enrollment." });
+    }
+  }
