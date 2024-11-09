@@ -30,7 +30,7 @@ const certificateSchema = new mongoose.Schema({
     },
     dateEarned: {
         type: Date,  // Date when the certificate was awarded
-        default: null
+        default: Date.now
     },
     dateCreated: {
         type: Date,

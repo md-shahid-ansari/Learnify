@@ -1,6 +1,7 @@
 import {Student} from '../models/student.model.js';
 import {Course} from '../models/course.model.js';
 import {Enrollment} from '../models/enrollment.model.js';
+import { Certificate } from '../models/certificate.model.js';
 
 
 export const updateStudent = async (req, res) => {
@@ -261,14 +262,81 @@ export const getEnrollment = async (req, res) => {
       // Fetch enrollments with selective population (excluding large GridFS files if applicable)
       const enrollment = await Enrollment.findById(enrollmentId)
       .populate('courseId');
-  
-      // Send response
-      res.status(200).json({
-        success: true,
-        enrollment,
-      });
+      
+      if (enrollment.progress === 100) {
+        try {
+            // Call issueCertificate with await
+            const { success, certificate } = await issueCertificate(enrollment);
+    
+            if (success) {
+                // Send response with the certificate included
+                res.status(200).json({
+                    success: true,
+                    enrollment,
+                    certificate
+                });
+            } else {
+                // Send response without the certificate (already issued)
+                res.status(200).json({
+                    success: true,
+                    enrollment,
+                });
+            }
+        } catch (error) {
+            console.error("Error issuing certificate:", error);
+            // Handle any errors that occur during certificate issuance
+            res.status(500).json({
+                success: false,
+                message: "An error occurred while issuing the certificate.",
+                error: error.message
+            });
+        }
+    } else {
+        // Send response for progress less than 100%
+        res.status(200).json({
+            success: true,
+            enrollment,
+        });
+    }
+    
     } catch (error) {
       console.error("Error fetching enrollment:", error);
       res.status(500).json({ error: "An error occurred while fetching enrollment." });
     }
 };
+
+
+export const issueCertificate = async (enrollment) => {
+    try {
+        // Check if enrollment progress is 100%
+        if (enrollment.progress === 100) {
+            // Check if the certificate already exists for this student and course
+            const existingCertificate = await Certificate.findOne({
+                course: enrollment.courseId,
+                earnedBy: enrollment.studentId
+            });
+
+            if (existingCertificate) {
+                return { success: true , certificate : existingCertificate};
+            }
+
+            // Create a new certificate document
+            const certificate = new Certificate({
+                title: `${enrollment.courseId.certificate.title}`, // Example title
+                description: `${enrollment.courseId.certificate.description}`, // Example description
+                course: enrollment.courseId,
+                tutor: enrollment.courseId.tutor, // Assuming tutor is referenced in the course
+                earnedBy: enrollment.studentId,
+                dateEarned: new Date()
+            });
+
+            // Save the certificate to the database
+            await certificate.save();
+
+            return { success: true , certificate};
+        }
+    } catch (error) {
+        console.error("Error issuing certificate:", error);
+    }
+};
+

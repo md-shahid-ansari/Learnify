@@ -318,6 +318,9 @@ const CourseViewer = ({ course , currEnrollment}) => {
                     setEnrollment(response.data.enrollment)
                     // console.log(response.data.enrollment)
                 }
+                if(response.data.certificate){
+                    showSuccessToast("Certificate Isssued!")
+                }
             } catch (err) {
                 if (err.response) {
                     showErrorToast(err.response.data.message || 'Something went wrong.');
