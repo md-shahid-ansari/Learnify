@@ -54,18 +54,6 @@ function Header() {
           <i className="fas fa-tachometer-alt text-xl" title="Dashboard"></i>
         </Link>
         <Link
-          to="/admin-home/manage-users"
-          className="bg-blue-200 hover:bg-blue-300 text-white font-semibold py-2 px-4 rounded"
-        >
-          <i className="fas fa-users text-xl" title="Manage Users"></i>
-        </Link>
-        <Link
-          to="/admin-home/admin-course"
-          className="bg-blue-200 hover:bg-blue-300 text-white font-semibold py-2 px-4 rounded"
-        >
-          <i className="fas fa-book text-xl" title="Manage Courses"></i>
-        </Link>
-        <Link
           to="/admin-home/admin-profile"
           className="bg-blue-200 hover:bg-blue-300 text-white font-semibold py-2 px-4 rounded"
         >

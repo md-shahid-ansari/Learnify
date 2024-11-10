@@ -19,8 +19,6 @@ import TutorProfileSettings from './Tutor/Pages/TutorProfileSettings';
 
 import AdminDashboard from './Admin/Pages/AdminDashboard';
 import AdminProfile from './Admin/Pages/AdminProfile';
-import AdminCourse from './Admin/Pages/AdminCourse';
-import ManageUsers from './Admin/Pages/ManageUsers';
 
 import LoginPage from './Auth/LoginPage';
 import RegistrationPage from './Auth/RegistrationPage';
@@ -74,8 +72,6 @@ const App = () => {
           <Route path="/admin-home" element={<AdminHome />}>
             <Route index element={<Navigate to="admin-dashboard" />} />
             <Route path="admin-dashboard" element={<AdminDashboard />} />
-            <Route path="admin-course" element={<AdminCourse />} />
-            <Route path="manage-users" element={<ManageUsers />} />
             <Route path="admin-profile" element={<AdminProfile />} />
           </Route>
 

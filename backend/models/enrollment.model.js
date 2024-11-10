@@ -4,6 +4,10 @@ import AutoIncrementFactory from "mongoose-sequence";  // Import the mongoose-se
 const AutoIncrement = AutoIncrementFactory(mongoose); // Initialize the auto-increment plugin
 
 const EnrollmentSchema = new mongoose.Schema({
+  enrollmentId:{
+    type: Number,
+    unique: true
+  },
   courseId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Course",

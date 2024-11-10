@@ -50,7 +50,16 @@ import {
     addQuiz,
     getCertificates
  } from "../controllers/student.controller.js";
-import { updateAdmin } from "../controllers/admin.controller.js";
+import { 
+    updateAdmin,
+    getAllAdmin,
+    getAllCertificates,
+    getAllCoursesWithoutAnyModule,
+    getAllTutors,
+    getAllStudents,
+    getAllEnrollments,
+    deleteBatch
+ } from "../controllers/admin.controller.js";
 
 
 const router = express.Router();
@@ -103,5 +112,14 @@ router.post("/add-lesson", addLesson);
 router.post("/add-quiz", addQuiz);
 router.post("/get-enrollment", getEnrollment);
 router.post("/certificates", getCertificates);
+
+router.post("/get-all-enrollments", getAllEnrollments);
+router.post("/get-all-admins", getAllAdmin);
+router.post("/get-all-certificates", getAllCertificates);
+router.post("/get-all-courses", getAllCoursesWithoutAnyModule);
+router.post("/get-all-tutors", getAllTutors);
+router.post("/get-all-students", getAllStudents);
+
+router.post("/delete-batch", deleteBatch);
 
 export default router;

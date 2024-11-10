@@ -112,6 +112,7 @@ export const enroll = async (req, res) => {
 };
 
 
+
 export const getEnrollments = async (req, res) => {
   const { studentId } = req.body;
 
@@ -252,7 +253,6 @@ const calculateProgress = (enrollment , totalLessonAndQuiz) => {
 
 export const getEnrollment = async (req, res) => {
     const { enrollmentId } = req.body;
-  
     // Validate input
     if (!enrollmentId) {
       return res.status(400).json({ error: "enrollment ID is required." });
