@@ -1,30 +1,42 @@
-// src/pages/Courses.js
-import React from "react";
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+
+const URL = process.env.REACT_APP_BACKEND_URL;
 
 const Courses = () => {
-  // Example courses data
-  const courses = [
-    {
-      id: 1,
-      title: "Introduction to JavaScript",
-      description: "Learn the basics of JavaScript, a popular programming language for web development.",
-    },
-    {
-      id: 2,
-      title: "React for Beginners",
-      description: "Get started with React, a powerful library for building user interfaces.",
-    },
-    {
-      id: 3,
-      title: "Python Programming",
-      description: "Explore Python programming and its applications in data science and web development.",
-    },
-    {
-      id: 4,
-      title: "Data Structures and Algorithms",
-      description: "Learn essential data structures and algorithms to improve coding efficiency.",
-    },
-  ];
+  const [loading, setLoading] = useState(true);
+  const [courses, setCourses] = useState([]);
+  const navigate = useNavigate();
+
+  // Fetch courses from the backend
+  const fetchCourses = async () => {
+    try {
+      const response = await axios.post(`${URL}/api/auth/courses`);
+      if (response.data.success) {
+        setCourses(response.data.courses);
+      } else {
+        console.error("Failed to fetch courses:", response.data.message);
+      }
+    } catch (error) {
+      console.error("Error fetching courses:", error);
+    }
+    setLoading(false);
+  };
+
+  // Call fetchCourses when the component mounts
+  useEffect(() => {
+    fetchCourses();
+  }, []);
+
+  // Show loading spinner while fetching data
+  if (loading) {
+    return (
+      <p className="text-center text-blue-500 text-xl font-semibold animate-pulse mt-10">
+        Loading...
+      </p>
+    );
+  }
 
   return (
     <div className="min-h-screen p-8 bg-gray-200">
@@ -34,7 +46,10 @@ const Courses = () => {
           <div key={course.id} className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
             <h2 className="text-xl font-semibold text-gray-800 mb-2">{course.title}</h2>
             <p className="text-gray-600 mb-4">{course.description}</p>
-            <button className="bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600 transition-colors duration-200">
+            <button
+              className="bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600 transition-colors duration-200"
+              onClick={() => navigate('/login-page')}  // Redirect to login page on click
+            >
               Learn More
             </button>
           </div>
