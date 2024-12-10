@@ -1,4 +1,4 @@
-# Learnify
+# Learnify 🚀
 
 Learnify is an online learning platform where tutors can create courses, students can enroll in courses, and both can manage their learning experience. Admins oversee the platform, manage users, and ensure the smooth operation of the system. Upon course completion, students receive certificates.
 
@@ -26,6 +26,7 @@ Learnify is an online learning platform where tutors can create courses, student
 ## Technology Stack
 
 - **Backend**: Node.js, Express.js
+- **Frontend**: React.js, Tailwind CSS
 - **Database**: MongoDB (with GridFS for file storage)
 - **Authentication**: JWT for secure role-based access control
 - **Others**: RESTful APIs
