@@ -123,11 +123,9 @@ Learnify is an online learning platform where tutors can create courses, student
 
 ---
 
-# Entity-Relationship Diagram (ERD) - Learnify
+# Entity-Relationship Diagram
 
 The Entity-Relationship Diagram (ERD) represents the database structure of Learnify, illustrating relationships between entities and their attributes. Below is a detailed description:
-
----
 
 ## **Entities and Relationships**
 
@@ -199,28 +197,20 @@ The Entity-Relationship Diagram (ERD) represents the database structure of Learn
 - **Relationships**:
   - A Certificate is generated for an Enrollment.
 
----
-
 ## **Visual Representation**
 ![ERD Diagram](erd.png)
 
----
-
-## **Summary**
 The ERD ensures a robust database structure, supporting efficient data retrieval and management across Learnify's functionalities. The relationships facilitate seamless interaction between Students, Tutors, and Admins.
 
 
 ---
 
-# Data Flow Diagram (DFD) - Learnify
+# Data Flow Diagram
 
 The Data Flow Diagram (DFD) represents the flow of information within the Learnify platform, outlining how data is processed by different components of the system. Below are the levels of the DFD:
 
 ![Context Diagram](dfd.png)
 
----
-
-## **Summary**
 The DFD highlights the efficient handling of user interactions, course content, and administrative operations within the Learnify platform. Each component ensures smooth operation and data security.
 
 
