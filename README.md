@@ -38,6 +38,9 @@ Learnify is an online learning platform where tutors can create courses, student
  ---
  ---
  ---
+ ---
+ ---
+ ---
 
 # Learnify 🚀
 
