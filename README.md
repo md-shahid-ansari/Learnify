@@ -188,8 +188,6 @@ The feasibility study evaluates the practicality of implementing Learnify within
 
 # Entity-Relationship Diagram
 
-The Entity-Relationship Diagram (ERD) represents the database structure of Learnify, illustrating relationships between entities and their attributes.
-
 ![ERD Diagram](erd.png)
 
 The ERD ensures a robust database structure, supporting efficient data retrieval and management across Learnify's functionalities. The relationships facilitate seamless interaction between Students, Tutors, and Admins.
@@ -197,8 +195,6 @@ The ERD ensures a robust database structure, supporting efficient data retrieval
 ---
 
 # Data Flow Diagram
-
-The Data Flow Diagram (DFD) represents the flow of information within the Learnify platform, outlining how data is processed by different components of the system.
 
 ![DFD Diagram](dfd.png)
 
