@@ -130,9 +130,15 @@ const CourseContent = ({ content, handleNavigation }) => {
                                         <div className="mt-4">
                                             {topic.links.map((link) => (
                                                 <div key={link._id} className="mt-2">
-                                                    <a href={link.url} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">
+                                                    <a
+                                                        href={/^https?:\/\//.test(link.url) ? link.url : `https://${link.url}`}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="text-blue-500 underline"
+                                                    >
                                                         {link.title}
                                                     </a>
+
                                                 </div>
                                             ))}
                                         </div>

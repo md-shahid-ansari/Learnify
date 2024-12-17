@@ -14,16 +14,20 @@ const TopicForm = ({ index, topic, onTopicChange, handleRemoveTopic }) => {
 
     // Sync props with local state
     useEffect(() => {
-        if (topic) {
+        if (JSON.stringify(topic) !== JSON.stringify(topicData)) {
             setTopicData(topic);
         }
-    }, [topic]);
+    }, [topic, topicData]);
+    
 
     // Helper to update state and propagate changes
     const updateTopicData = (updatedData) => {
-        setTopicData(updatedData);
-        onTopicChange(index, updatedData);  // Trigger parent update
+        if (JSON.stringify(topicData) !== JSON.stringify(updatedData)) {
+            setTopicData(updatedData);
+            onTopicChange(index, updatedData); // Trigger parent update
+        }
     };
+    
 
     const handleAddOutcome = () => {
         const updatedData = {
@@ -46,7 +50,7 @@ const TopicForm = ({ index, topic, onTopicChange, handleRemoveTopic }) => {
     };
 
     const handleAddImage = () => {
-        const newImage = {id: nanoid(), title: '', file: null, previewUrl: null };
+        const newImage = {_id: nanoid(), title: '', file: null, previewUrl: null };
         updateTopicData({
             ...topicData,
             images: [...(topicData.images || []), newImage]
@@ -81,7 +85,7 @@ const TopicForm = ({ index, topic, onTopicChange, handleRemoveTopic }) => {
     };
 
     const handleAddlink = () => {
-        const newLink = { id: nanoid(), title: '', url: '' };
+        const newLink = {id: nanoid(), title: '', url: '' };
         updateTopicData({
             ...topicData,
             links: [...(topicData.links || []), newLink]
@@ -89,13 +93,13 @@ const TopicForm = ({ index, topic, onTopicChange, handleRemoveTopic }) => {
     };
 
     const handleRemovelink = (linkId) => {
-        const updatedLinks = (topicData.links || []).filter((link) => link._id !== linkId);
+        const updatedLinks = (topicData.links || []).filter((link) => link.id !== linkId);
         updateTopicData({ ...topicData, links: updatedLinks });
     };
 
     const handleLinkChange = (linkId, field, value) => {
         const updatedLinks = (topicData.links || []).map((link) =>
-            link._id === linkId ? { ...link, [field]: value } : link
+            link.id === linkId ? { ...link, [field]: value } : link
         );
         updateTopicData({ ...topicData, links: updatedLinks });
     };
@@ -220,24 +224,24 @@ const TopicForm = ({ index, topic, onTopicChange, handleRemoveTopic }) => {
             <div>
                 <h6 className="text-md font-semibold">Links</h6>
                 {(topicData.links || []).map((link) => (
-                    <div key={link._id} className="flex items-center mb-2">
+                    <div key={link.id} className="flex items-center mb-2">
                         <input
                             type="text"
                             value={link.title}
-                            onChange={(e) => handleLinkChange(link._id, 'title', e.target.value)}
+                            onChange={(e) => handleLinkChange(link.id, 'title', e.target.value)}
                             placeholder="Link Title"
                             className="mr-2 w-full p-2 border border-gray-300 rounded"
                         />
                         <input
                             type="text"
                             value={link.url}
-                            onChange={(e) => handleLinkChange(link._id, 'url', e.target.value)}
+                            onChange={(e) => handleLinkChange(link.id, 'url', e.target.value)}
                             placeholder="Link URL"
                             className="mr-2 w-full p-2 border border-gray-300 rounded"
                         />
                         <button
                             type="button"
-                            onClick={() => handleRemovelink(link._id)}
+                            onClick={() => handleRemovelink(link.id)}
                             className="mt-2 px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600"
                             aria-label={`Remove link`}
                         >
