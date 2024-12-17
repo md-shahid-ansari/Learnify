@@ -309,24 +309,40 @@ export const updateCourse = async (req, res) => {
     }
 
     try {
-        // Find and update the main course fields, or create a new course if needed
-        let updatedCourse = course._id 
-            ? await Course.findByIdAndUpdate(course._id, {
-                title: course.title,
-                description: course.description,
-                certificate: course.certificate,
-                tutor: tutorId,
-            }, { new: true })
-            : new Course({
-                title: course.title,
-                description: course.description,
-                certificate: course.certificate,
-                tutor: tutorId,
-            });
 
-        if (!updatedCourse) {
+        // Fetch the existing course and its modules before update
+        let existingCourse = await Course.findById(course._id).populate({
+            path: 'modules',
+            populate: {
+                path: 'lessons quizzes',
+                populate: { path: 'topics' },
+            },
+        });
+
+        if (!existingCourse) {
             return res.status(404).json({ error: "Course not found." });
         }
+
+        const existingModuleIds = existingCourse.modules.map(mod => mod._id.toString());
+        const existingLessonIds = [];
+        const existingTopicIds = [];
+        const existingQuizIds = [];
+
+        existingCourse.modules.forEach(module => {
+            existingLessonIds.push(...module.lessons.map(lesson => lesson._id.toString()));
+            existingQuizIds.push(...module.quizzes.map(quiz => quiz._id.toString()));
+            module.lessons.forEach(lesson => {
+                existingTopicIds.push(...lesson.topics.map(topic => topic._id.toString()));
+            });
+        });
+
+        // Update course fields
+        let updatedCourse = await Course.findByIdAndUpdate(course._id, {
+            title: course.title,
+            description: course.description,
+            certificate: course.certificate,
+            tutor: tutorId,
+        }, { new: true });
 
         const moduleIds = [];
         const lessonIds = [];
@@ -469,11 +485,11 @@ export const updateCourse = async (req, res) => {
             await module.save();
         }
 
-        // Delete any modules, lessons, topics, and quizzes that were not in the update
-        await Module.deleteMany({ _id: { $nin: moduleIds } });
-        await Lesson.deleteMany({ _id: { $nin: lessonIds } });
-        await Topic.deleteMany({ _id: { $nin: topicIds } });
-        await Quiz.deleteMany({ _id: { $nin: quizIds } });
+        // Delete modules, lessons, topics, and quizzes that are no longer included
+        await Module.deleteMany({ _id: { $in: existingModuleIds, $nin: moduleIds } });
+        await Lesson.deleteMany({ _id: { $in: existingLessonIds, $nin: lessonIds } });
+        await Topic.deleteMany({ _id: { $in: existingTopicIds, $nin: topicIds } });
+        await Quiz.deleteMany({ _id: { $in: existingQuizIds, $nin: quizIds } });
 
         await updatedCourse.save();
 
