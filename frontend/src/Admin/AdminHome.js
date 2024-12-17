@@ -1,6 +1,5 @@
 import React from 'react';
 import { Outlet} from 'react-router-dom';
-import Footer from './Footer';
 import Header from './Header';
 
 const AdminHome = () => {
@@ -9,8 +8,7 @@ const AdminHome = () => {
       <Header />
       <main className="flex-grow pt-16 overflow-auto thin-scrollbar">
           <Outlet />
-        </main>
-      <Footer />
+      </main>
     </div>
     );
 };
